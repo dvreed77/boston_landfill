@@ -4,7 +4,7 @@ This is a project I became interested in a long time ago.  I have been in Boston
 After a little bit of digging, I found the best dataset [here][1], a crappy GIF.  I probably could have emailed the professor for something more high quality and since I am always up for a challenge, I wanted to use this as my base dataset to practice the following.
 
 * Understand GIFs in Python
-* Some basic image processing: dilation/corrosion, thresholding, smoothing, etc.
+* Some basic image processing: dilation/erosion, thresholding, smoothing, etc.
 * Extract contours/shapes from an image
 * Shape manipulations: merging, intersection
 * SVG creation
@@ -21,10 +21,80 @@ Original data was sourced here, from GIF image: http://www.bc.edu/bc_org/avp/cas
 
 
 ## Key Lessons
+### Read GIF in Python
+A colored GIF is just a F x M x N x C array, where F is the number of frames, M and N are the height and width, and C=3 are the 3 RGB channels.
+
+Easy to read image (and make Greyscale):
+
+```python
+from skimage.io import imread
+from skimage.color import rgb2gray
+
+image = rgb2gray(imread(fname))
+```
+
+### Basic Image Processing
+#### Resizing
+
+```python
+from skimage.transform import resize as resize_image
+
+image = resize_image(image, (1000, 1000))
+```
+
+#### Slight blur
+
+```python
+from skimage.filters import gaussian
+
+image = gaussian(image, 2)
+```
+
+#### Thresholding
+I used `threshold_minimum` which is described as: The histogram of the input image is computed and smoothed until there are only two maxima. Then the minimum in between is the threshold value.
+
+It is described in more detail [here][0]
+
+```python
+threshold = threshold_minimum(rimage)
+
+binary = (image > threshold).astype(int)
+  # binary = binary_dilation(binary)
+
+  return binary
+
+```
+
+#### Erosion/Dilation
+```python
+from skimage.morphology import binary_dilation, binary_erosion
+
+image = binary_dilation(image)
+```
 
 ### Get contours from image
+This creates contours where image = 0. Since we created a binary image with thresholding, this is easy.
 
-In order to get contours from image
+```python
+from skimage import measure
+
+contours = measure.find_contours(image, 0)
+```
+
+### Contour to Shapes
+
+```python
+from shapely.geometry import Polygon
+
+polygon = Polygon(c)
+```
+
+### Simplify shapes
+
+```python
+p = polygon.simplify(0.5, preserve_topology=True)
+```
+
 
 ### Convert contours to SVG
 
@@ -46,3 +116,22 @@ for interior in shape.interiors:
 
 
 ### Convert contours to GeoJSON
+
+```python
+from shapely.geometry import mapping
+import json
+
+out = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": { "layer": 5, "region": "logan_airport" },
+            "geometry": mapping(shape)
+        }
+    ]        
+}
+
+json.dump(out, open('test.geojson', 'w'))
+
+```
