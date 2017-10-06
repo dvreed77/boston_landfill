@@ -13,7 +13,22 @@ from skimage.morphology import *
 from skimage.transform import resize as resize_image
 from skimage.filters import gaussian
 from shapely.geometry import Polygon
+from shapely.geometry import mapping
+import json
 
+
+def to_json(shapes, fname):
+    out = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": { "layer": 5, "region": "logan_airport" },
+                "geometry": mapping(shapes[0])
+            }
+        ]        
+    }
+    json.dump(out, open(os.path.join(DATA_DIR, 'test.geojson'), 'w'))
 
 def get_image(fname):
     return rgb2gray(imread(fname))
@@ -127,9 +142,20 @@ def to_svg(fname, shapes):
     dwg = svgwrite.Drawing(filename=fname, debug=True)
 
     for shape in shapes:
-        # polygon = Polygon(c)
-        shape = shape.simplify(0.5, preserve_topology=True)
         path = shape2svgpath(shape)
         dwg.add(path)
 
+    dwg.save()
+
+
+def to_svg2(fname, layers):
+    dwg = svgwrite.Drawing(filename=fname, debug=True)
+
+    for idx,layer in enumerate(layers):
+        group = svgwrite.container.Group(id='layer%i' % idx)
+        for shape in layer:
+            path = shape2svgpath(shape)
+            group.add(path)
+
+        dwg.add(group)
     dwg.save()

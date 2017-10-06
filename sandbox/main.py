@@ -58,6 +58,34 @@ to_svg(fname=os.path.join(DATA_DIR, 'layer_last.svg'), shapes=out_shapes)
 
 
 ### DO IT FOR THE WHOLE STACK
+
+image = gif_stack[-1]
+
+def process_image(image):
+    rimage = crop_resize_image(image, crop)
+    timage = threshold_image(rimage, threshold)
+    contours = extract_contours(timage)
+
+    contours = filter(lambda x: len(x) > 80, contours)
+    o = []
+    for idx, c in enumerate(contours):
+        polygon = Polygon(c)
+        p = polygon.simplify(0.5, preserve_topology=True)
+        o.append(p)
+
+    out_shapes = merge_shapes(o)
+    return out_shapes
+
+layers = []
+for image in gif_stack[-10:]:
+    shapes = process_image(image)
+    layers.append(shapes)
+
+
+
+# to_svg2(fname=os.path.join(DATA_DIR, 'test2.svg'), layers=layers)
+
+
 gif_shape = gif_stack.shape
 
 new_gif_stack = np.empty((gif_shape[0], 1000, 1000))
@@ -82,4 +110,4 @@ imshow(nimage)
 
 
 contours = extract_contours(nimage)
-to_svg(fname=os.path.join(DATA_DIR, 'layer50.svg'), contours=contours)
+to_svg2(fname=os.path.join(DATA_DIR, 'layer50.svg'), contours=contours)
