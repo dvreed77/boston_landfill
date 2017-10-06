@@ -1,5 +1,22 @@
-# Source Data
-Original data was sourced here: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
+# Boston Landfill
+This is a project I became interested in a long time ago.  I have been in Boston for over 12 years, and knew that Boston was built over time from a sequence of landfill projects.  I was interested in creating an app that allowed the user to scrub through time.  
+
+After a little bit of digging, I found the best dataset [here][1], a crappy GIF.  I probably could have emailed the professor for something more high quality and since I am always up for a challenge, I wanted to use this as my base dataset to practice the following.
+
+* Understand GIFs in Python
+* Some basic image processing: dilation/corrosion, thresholding, smoothing, etc.
+* Extract contours/shapes from an image
+* Shape manipulations: merging, intersection
+* SVG creation
+* GeoJSON creation
+* Interactive React App with GeoJSON objects
+
+
+[1]: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
+
+
+## Data
+Original data was sourced here, from GIF image: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
 
 
 
