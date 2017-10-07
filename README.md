@@ -1,6 +1,6 @@
 # Boston Landfill
 
-![Alt text](/data/screenshot_1.png?raw=true "Optional Title")
+![Alt text](/data/screenshot_1.png?raw=true "Extracted Shapes from GIF")
 
 This is a project I became interested in a long time ago.  I have been in Boston for over 12 years, and knew that Boston was built over time from a sequence of landfill projects.  I was interested in creating an app that allowed the user to scrub through time and see what parts of Boston were changed and when.  
 
@@ -17,10 +17,10 @@ After a little bit of digging, I found the best dataset [here][1], a crappy GIF.
 
 [1]: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
 
+[0]: http://scikit-image.org/docs/dev/auto_examples/xx_applications/plot_thresholding.html#bimodal-histogram
 
 ## Data
 Original data was sourced here, a GIF image: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
-
 
 
 ## Key Lessons
