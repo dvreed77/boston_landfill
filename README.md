@@ -2,9 +2,9 @@
 
 ![Alt text](/data/screenshot_1.png?raw=true "Optional Title")
 
-This is a project I became interested in a long time ago.  I have been in Boston for over 12 years, and knew that Boston was built over time from a sequence of landfill projects.  I was interested in creating an app that allowed the user to scrub through time.  
+This is a project I became interested in a long time ago.  I have been in Boston for over 12 years, and knew that Boston was built over time from a sequence of landfill projects.  I was interested in creating an app that allowed the user to scrub through time and see what parts of Boston were changed and when.  
 
-After a little bit of digging, I found the best dataset [here][1], a crappy GIF.  I probably could have emailed the professor for something more high quality and since I am always up for a challenge, I wanted to use this as my base dataset to practice the following.
+After a little bit of digging, I found the best dataset [here][1], a crappy GIF.  I probably could have emailed the professor for something of higher quality, but since I am always up for a challenge, I wanted to use this to practice a variety of skills:
 
 * Understand GIFs in Python
 * Some basic image processing: dilation/erosion, thresholding, smoothing, etc.
@@ -19,7 +19,7 @@ After a little bit of digging, I found the best dataset [here][1], a crappy GIF.
 
 
 ## Data
-Original data was sourced here, from GIF image: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
+Original data was sourced here, a GIF image: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
 
 
 
