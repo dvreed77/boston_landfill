@@ -1,113 +1,26 @@
-from sandbox.settings import DATA_DIR
+from sandbox.settings import DATA_DIR, CROP, THRESHOLD
 
 from sandbox.extract_contours import *
 
-landfill_gif = os.path.join(DATA_DIR, 'sequ_ani.gif')
-precrop_image = os.path.join(DATA_DIR, 'precrop.jpg')
-svg_out = os.path.join(DATA_DIR, 'layer1.svg')
+gif_stack = get_gif_stack()
 
-# extract image
-gif_stack = get_image(landfill_gif)
-
-# focus on 1st image
-image = gif_stack[0]
-
-
-# save to file to find crop boundaries
-save_image(precrop_image, image)
-
-# found crop using Preview
-crop = [235, 235]
-rimage = crop_resize_image(image, crop)
-imshow(rimage)
-threshold = threshold_minimum(rimage)
-timage = threshold_image(rimage, threshold)
-imshow(timage)
-
-contours = extract_contours(image)
-to_svg(fname=svg_out, contours=contours)
-
-
-
-
-# focus on last image
-image = gif_stack[-1]
-rimage = crop_resize_image(image, crop)
-imshow(rimage)
-
-timage = threshold_image(rimage, threshold)
-imshow(timage)
-
-
-
-contours = extract_contours(timage)
-
-contours = filter(lambda x: len(x) > 80, contours)
-len(contours)
-
-o = []
-for idx, c in enumerate(contours):
-    polygon = Polygon(c)
-    p = polygon.simplify(0.5, preserve_topology=True)
-    o.append(p)
-
-
-out_shapes = merge_shapes(o)
-to_svg(fname=os.path.join(DATA_DIR, 'layer_last.svg'), shapes=out_shapes)
-
-
-
-### DO IT FOR THE WHOLE STACK
-
-image = gif_stack[-1]
-
-def process_image(image):
-    rimage = crop_resize_image(image, crop)
-    timage = threshold_image(rimage, threshold)
-    contours = extract_contours(timage)
-
-    contours = filter(lambda x: len(x) > 80, contours)
-    o = []
-    for idx, c in enumerate(contours):
-        polygon = Polygon(c)
-        p = polygon.simplify(0.5, preserve_topology=True)
-        o.append(p)
-
-    out_shapes = merge_shapes(o)
-    return out_shapes
-
+# Process all layers
 layers = []
-for image in gif_stack[-10:]:
+for image in gif_stack[:]:
     shapes = process_image(image)
     layers.append(shapes)
 
 
+# Subtract subsequent layer from new layer
+layers2 = []
+for idx in range(1, len(layers)):
+    l_tmp0 = [x.buffer(0.0) for x in layers[idx-1]]
+    l_tmp1 = [x.buffer(0.0) for x in layers[idx]]
 
-# to_svg2(fname=os.path.join(DATA_DIR, 'test2.svg'), layers=layers)
+    mp = MultiPolygon(l_tmp1).difference(MultiPolygon(l_tmp0))
+    layers2.append(mp)
 
+layers2[50]
+to_svg2('data/final_v1.svg',  layers2[::-1] + [layers[0]])
 
-gif_shape = gif_stack.shape
-
-new_gif_stack = np.empty((gif_shape[0], 1000, 1000))
-
-for i, g in enumerate(gif_stack):
-    itmp_ = pre_process_image(g, crop, threshold)
-    new_gif_stack[i,:,:] = itmp_
-
-
-imshow(new_gif_stack[50])
-
-image = new_gif_stack[50]
-
-padding = 10
-shape = image.shape
-
-nimage = np.zeros((shape[0]+2*padding,shape[1]+2*padding))
-
-nimage[padding:shape[0]+padding,padding:shape[1]+padding] = image
-
-imshow(nimage)
-
-
-contours = extract_contours(nimage)
-to_svg2(fname=os.path.join(DATA_DIR, 'layer50.svg'), contours=contours)
+([layers[0]] + layers2)[2]

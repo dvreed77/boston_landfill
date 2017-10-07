@@ -1,20 +1,63 @@
 import os
+import json
 
-import svgwrite
 import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+import svgwrite
+
+from skimage import measure
 from skimage.io import imread, imsave
 from skimage.color import rgb2gray
-from skimage.filters import threshold_mean
-import numpy as np
-import matplotlib.pyplot as plt
-from skimage import measure
 from skimage.morphology import *
 from skimage.transform import resize as resize_image
-from skimage.filters import gaussian
-from shapely.geometry import Polygon
-from shapely.geometry import mapping
-import json
+from skimage.filters import gaussian, threshold_minimum, threshold_mean
+
+from shapely.geometry import mapping, Polygon
+
+from sandbox.settings import DATA_DIR
+
+
+def process_image(image):
+
+    # crop and resize image
+    rimage = crop_resize_image(image, crop)
+
+    # threshold image
+    timage = threshold_image(rimage, threshold)
+
+    # extract contours
+    contours = extract_contours(timage)
+
+    # remove small contours (80 seems to be a good number)
+    contours = filter(lambda x: len(x) > 80, contours)
+
+    # convert contours to shapely polygons
+    o = []
+    for idx, c in enumerate(contours):
+        polygon = Polygon(c)
+        p = polygon.simplify(0.5, preserve_topology=True)
+        o.append(p)
+
+    # merge shapes by subtracting holes from larger shapes, etc.
+    out_shapes = merge_shapes(o)
+    return out_shapes
+
+
+def get_image(fname):
+    return rgb2gray(imread(fname))
+
+
+def get_gif_stack():
+    landfill_gif = os.path.join(DATA_DIR, 'sequ_ani.gif')
+    return get_image(landfill_gif)
+
+
+def get_threshold(image):
+    threshold = threshold_minimum(image)
+
+    return threshold
 
 
 def to_json(shapes, fname):
@@ -29,9 +72,6 @@ def to_json(shapes, fname):
         ]
     }
     json.dump(out, open(os.path.join(DATA_DIR, 'test.geojson'), 'w'))
-
-def get_image(fname):
-    return rgb2gray(imread(fname))
 
 
 def save_image(fname, image):
@@ -86,11 +126,9 @@ def merge_shapes(shapes):
     for k,v in master.iteritems():
         m = shapes[k]
         for c in v:
-            # if shapes[c].is_valid:
             m = m.difference(shapes[c])
-            # else:
-            #     print('invalid shape')
 
+        #HACK: if output is a MultiPolygon for some reason, just pick the first
         if type(m) == MultiPolygon:
             out_shapes.append(m.geoms[0])
         else:
