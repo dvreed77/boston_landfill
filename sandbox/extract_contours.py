@@ -3,8 +3,6 @@ import json
 
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.pyplot as plt
 import svgwrite
 
 from skimage import measure
@@ -14,12 +12,12 @@ from skimage.morphology import *
 from skimage.transform import resize as resize_image
 from skimage.filters import gaussian, threshold_minimum, threshold_mean
 
-from shapely.geometry import mapping, Polygon
+from shapely.geometry import mapping, Polygon, MultiPolygon
 
 from sandbox.settings import DATA_DIR
 
 
-def process_image(image):
+def process_image(image, crop, threshold):
 
     # crop and resize image
     rimage = crop_resize_image(image, crop)
@@ -71,7 +69,7 @@ def to_json(shapes, fname):
             }
         ]
     }
-    json.dump(out, open(os.path.join(DATA_DIR, 'test.geojson'), 'w'))
+    json.dump(out, open(fname, 'w'))
 
 
 def save_image(fname, image):
@@ -80,7 +78,7 @@ def save_image(fname, image):
 
 def crop_resize_image(image, crop, resize=1000):
     image = image[:crop[0], :crop[1]]
-    image = resize_image(image, (1000, 1000))
+    image = resize_image(image, (resize, resize))
     return image
 
 
@@ -149,7 +147,7 @@ def imshow(image):
 
 def plot_contours(contours):
     for n, contour in enumerate(contours):
-        ax.plot(contour[:, 1], contour[:, 0], linewidth=2)
+        plt.plot(contour[:, 1], contour[:, 0], linewidth=2)
 
 
 def contour2path(contour):
@@ -188,6 +186,7 @@ def to_svg(fname, shapes):
 
 def to_svg2(fname, layers):
 
+    # created using: https://gka.github.io/palettes/#colors=lightyellow,orange,deeppink,darkred|steps=7|bez=1|coL=1
     colors = ['#ffffe0','#ffdaa3','#ffb27c','#fb8768','#eb5f5b','#d3394a','#b3152f','#ffffe0','#ffdaa3','#ffb27c','#fb8768','#eb5f5b','#d3394a','#b3152f','#8b0000']
     dwg = svgwrite.Drawing(filename=fname, debug=True)
 
@@ -195,16 +194,12 @@ def to_svg2(fname, layers):
         color = colors[idx % len(colors)]
         group = svgwrite.container.Group(id='layer%i' % idx, fill=color)
 
+        #TODO: all shapes should be MultiPolygons
         if type(layer) == Polygon:
-            path = shape2svgpath(p)
+            path = shape2svgpath(layer)
             group.add(path)
         else:
             for polygon in layer:
-                # if type(polygon) == MultiPolygon:
-                #     for p in polygon.geoms:
-                #         path = shape2svgpath(p)
-                #         group.add(path)
-                # else:
                 path = shape2svgpath(polygon)
                 group.add(path)
 

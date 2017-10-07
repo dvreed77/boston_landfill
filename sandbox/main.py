@@ -7,7 +7,7 @@ gif_stack = get_gif_stack()
 # Process all layers
 layers = []
 for image in gif_stack[:]:
-    shapes = process_image(image)
+    shapes = process_image(image, CROP, THRESHOLD)
     layers.append(shapes)
 
 
@@ -20,7 +20,4 @@ for idx in range(1, len(layers)):
     mp = MultiPolygon(l_tmp1).difference(MultiPolygon(l_tmp0))
     layers2.append(mp)
 
-layers2[50]
-to_svg2('data/final_v1.svg',  layers2[::-1] + [layers[0]])
-
-([layers[0]] + layers2)[2]
+to_svg2('data/final_temp.svg',  layers2[::-1] + [layers[0]])
