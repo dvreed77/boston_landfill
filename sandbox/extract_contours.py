@@ -26,7 +26,7 @@ def to_json(shapes, fname):
                 "properties": { "layer": 5, "region": "logan_airport" },
                 "geometry": mapping(shapes[0])
             }
-        ]        
+        ]
     }
     json.dump(out, open(os.path.join(DATA_DIR, 'test.geojson'), 'w'))
 
@@ -149,13 +149,28 @@ def to_svg(fname, shapes):
 
 
 def to_svg2(fname, layers):
+
+    colors = ['#ffffe0','#ffdaa3','#ffb27c','#fb8768','#eb5f5b','#d3394a','#b3152f','#ffffe0','#ffdaa3','#ffb27c','#fb8768','#eb5f5b','#d3394a','#b3152f','#8b0000']
     dwg = svgwrite.Drawing(filename=fname, debug=True)
 
     for idx,layer in enumerate(layers):
-        group = svgwrite.container.Group(id='layer%i' % idx)
-        for shape in layer:
-            path = shape2svgpath(shape)
+        color = colors[idx % len(colors)]
+        group = svgwrite.container.Group(id='layer%i' % idx, fill=color)
+
+        if type(layer) == Polygon:
+            path = shape2svgpath(p)
             group.add(path)
+        else:
+            for polygon in layer:
+                # if type(polygon) == MultiPolygon:
+                #     for p in polygon.geoms:
+                #         path = shape2svgpath(p)
+                #         group.add(path)
+                # else:
+                path = shape2svgpath(polygon)
+                group.add(path)
+
+
 
         dwg.add(group)
     dwg.save()

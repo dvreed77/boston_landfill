@@ -1,4 +1,7 @@
 # Boston Landfill
+
+![Alt text](/data/screenshot_1.png?raw=true "Optional Title")
+
 This is a project I became interested in a long time ago.  I have been in Boston for over 12 years, and knew that Boston was built over time from a sequence of landfill projects.  I was interested in creating an app that allowed the user to scrub through time.  
 
 After a little bit of digging, I found the best dataset [here][1], a crappy GIF.  I probably could have emailed the professor for something more high quality and since I am always up for a challenge, I wanted to use this as my base dataset to practice the following.
