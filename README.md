@@ -13,6 +13,7 @@ After a little bit of digging, I found the best dataset [here][1], a crappy GIF.
 * SVG creation
 * GeoJSON creation
 * Interactive React App with GeoJSON objects
+* React App for timelines, and other Interactive elements
 
 
 [1]: http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html
