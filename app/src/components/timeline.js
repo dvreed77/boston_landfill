@@ -93,10 +93,6 @@ export default class App2 extends Component {
     const totalTime = 5000,
       steps = 1000,
       dw = width / steps
-      // dt = totalTime / steps
-
-
-
 
     setInterval(()=>{
       //   state.cursorPosition = state.cursorPosition + dw
@@ -140,14 +136,6 @@ export default class App2 extends Component {
     const xScale = d3.scaleLinear()
       .domain([minYear, maxYear])
       .range([0, width])
-
-    const totalTime = 5000,
-      steps = 1000,
-      dw = width / steps,
-      dt = totalTime / steps
-
-    console.log(dw, dt)
-
 
 
     return (

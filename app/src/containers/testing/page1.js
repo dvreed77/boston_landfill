@@ -1,5 +1,6 @@
 import React from 'react'
 import Timeline from '../../components/timeline'
+import Map from '../../components/map'
 
 
 
@@ -13,6 +14,7 @@ class Page1 extends React.Component {
       <div>
         <h1>Timeline</h1>
         <Timeline />
+        <Map/>
       </div>
     );
   }
