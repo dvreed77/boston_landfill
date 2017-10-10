@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import * as d3 from 'd3'
 import {customEvent, event, mouse, select} from "d3-selection";
+import scrub from '../utils/scrub'
 
 
 
@@ -41,32 +42,32 @@ export default class App2 extends Component {
       .domain([1800, 2016])
       .range([0, 800])
 
-    // var brush = d3.brushX()
-    //   // .brux(xScale)
-    //   // .extent([0, 0])
-    //   .on("brush", d=>console.log('logging brush'))
-    // // .on("brushend", brushend);
+    var brush = scrub()
+      // .brux(xScale)
+      // .extent([0, 0])
+      .on("brush", d=>console.log('logging brush'))
+    // .on("brushend", brushend);
     //
-    // var slider = svg
-    //   .append("g")
-    //   .attr("class", "slider")
-    //   .call(brush);
-
-    var overlay = svg
+    var slider = svg
       .append("g")
       .attr("class", "slider")
-      .append('rect')
-      .attr("class", "overlay")
-      .attr("pointer-events", "all")
-      .attr("cursor", "crosshair")
-      .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)")
-      .attr("fill", "none")
-      .attr("pointer-events", "all")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", 500)
-      .attr("height", 500)
-      .on("mousedown.dave", d=>console.log('mousedown', event))
+      .call(brush);
+
+    // var overlay = svg
+    //   .append("g")
+    //   .attr("class", "slider")
+    //   .append('rect')
+    //   .attr("class", "overlay")
+    //   .attr("pointer-events", "all")
+    //   .attr("cursor", "crosshair")
+    //   .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)")
+    //   .attr("fill", "none")
+    //   .attr("pointer-events", "all")
+    //   .attr("x", 0)
+    //   .attr("y", 0)
+    //   .attr("width", 500)
+    //   .attr("height", 500)
+    //   .on("mousedown.dave", d=>console.log('mousedown', event))
 
 
 
