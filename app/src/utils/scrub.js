@@ -359,6 +359,8 @@ function brush(dim) {
         [w0 = dim === Y ? W : point0[0], n0 = dim === X ? N : point0[1]],
         [e0 = dim === Y ? E : w0, s0 = dim === X ? S : n0]
       ];
+
+      state.position = point[0]
     } else {
       // w0 = selection[0][0];
       // n0 = selection[0][1];
