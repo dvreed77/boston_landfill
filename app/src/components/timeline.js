@@ -1,9 +1,6 @@
 import React, {Component} from 'react'
 import * as d3 from 'd3'
-import {customEvent, event, mouse, select} from "d3-selection";
 import scrub from '../utils/scrub'
-
-
 
 export default class App2 extends Component {
 
@@ -11,44 +8,19 @@ export default class App2 extends Component {
     cursorPosition: 0,
   }
 
-  componentWillMount() {
-    const width = 800
-
-    const fps = 30,
-      dt = 1/fps
-
-    const totalTime = 5000,
-      steps = 1000,
-      dw = width / steps
-
-    // setInterval(()=>{
-    //   //   state.cursorPosition = state.cursorPosition + dw
-    //   this.setState({
-    //     cursorPosition: (this.state.cursorPosition + dw) % width
-    //   })
-    //   // console.log('ts', state.cursorPosition)
-    // }, dt)
-  }
-
   componentDidMount() {
-    this.draw(this.state.svg)
+    this.draw(this.svg)
   }
 
   draw(ref) {
 
     const svg = d3.select(ref)
 
-    const xScale = d3.scaleLinear()
-      .domain([1800, 2016])
-      .range([0, 800])
 
-    var brush = scrub()
-      // .brux(xScale)
-      // .extent([0, 0])
+    const brush = scrub()
       .on("brush", d=>console.log('logging brush'))
-    // .on("brushend", brushend);
-    //
-    var slider = svg
+
+    svg
       .append("g")
       .attr("class", "slider")
       .call(brush);
@@ -110,7 +82,7 @@ export default class App2 extends Component {
 
     return (
       <div>
-        <svg width={width} height={height} ref={(svg) => { this.state.svg = svg }}>
+        <svg width={width} height={height} ref={(svg) => { this.svg = svg }}>
           {zones2.map((zone, idx)=>{
             return <rect
               key={idx}

@@ -124,7 +124,10 @@ function defaultExtent() {
 
 // Like d3.local, but with the name “__brush” rather than auto-generated.
 function local(node) {
-  while (!node.__brush) if (!(node = node.parentNode)) return;
+  while (!node.__brush) {
+    node = node.parentNode
+    if (!node) return;
+  }
   return node.__brush;
 }
 
@@ -307,11 +310,17 @@ function brush(dim) {
 
   Emitter.prototype = {
     beforestart: function() {
-      if (++this.active === 1) this.state.emitter = this, this.starting = true;
+      if (++this.active === 1) {
+        this.state.emitter = this
+        this.starting = true;
+      }
       return this;
     },
     start: function() {
-      if (this.starting) this.starting = false, this.emit("start");
+      if (this.starting) {
+        this.starting = false
+        this.emit("start");
+      }
       return this;
     },
     brush: function() {
@@ -319,7 +328,10 @@ function brush(dim) {
       return this;
     },
     end: function() {
-      if (--this.active === 0) delete this.state.emitter, this.emit("end");
+      if (--this.active === 0) {
+        delete this.state.emitter
+        this.emit("end");
+      }
       return this;
     },
     emit: function(type) {
@@ -332,10 +344,24 @@ function brush(dim) {
     else if (touchending) return;
     if (!filter.apply(this, arguments)) return;
 
-    var that = this,
-      type = event.target.__data__.type,
-      mode = (event.metaKey ? type = "overlay" : type) === "selection" ? MODE_DRAG : (event.altKey ? MODE_CENTER : MODE_HANDLE),
-      signX = dim === Y ? null : signsX[type],
+    let that = this,
+      type = event.target.__data__.type
+
+    let a, mode
+    if (event.metaKey) {
+      type = "overlay"
+    }
+    a = type
+
+    if (a === "selection") {
+      mode = MODE_DRAG
+    } else {
+      mode = event.altKey ? MODE_CENTER : MODE_HANDLE
+    }
+    // let t_ = (event.metaKey ? type = "overlay" : type)
+    //   mode = (event.metaKey ? type = "overlay" : type) === "selection" ? MODE_DRAG : (event.altKey ? MODE_CENTER : MODE_HANDLE),
+
+    let signX = dim === Y ? null : signsX[type],
       signY = dim === X ? null : signsY[type],
       state = local(that),
       extent = state.extent,
@@ -419,41 +445,89 @@ function brush(dim) {
       switch (mode) {
         case MODE_SPACE:
         case MODE_DRAG: {
-          if (signX) dx = Math.max(W - w0, Math.min(E - e0, dx)), w1 = w0 + dx, e1 = e0 + dx;
-          if (signY) dy = Math.max(N - n0, Math.min(S - s0, dy)), n1 = n0 + dy, s1 = s0 + dy;
+          if (signX) {
+            dx = Math.max(W - w0, Math.min(E - e0, dx))
+            w1 = w0 + dx
+            e1 = e0 + dx;
+          }
+          if (signY) {
+            dy = Math.max(N - n0, Math.min(S - s0, dy))
+            n1 = n0 + dy
+            s1 = s0 + dy;
+          }
           break;
         }
         case MODE_HANDLE: {
-          if (signX < 0) dx = Math.max(W - w0, Math.min(E - w0, dx)), w1 = w0 + dx, e1 = e0;
-          else if (signX > 0) dx = Math.max(W - e0, Math.min(E - e0, dx)), w1 = w0, e1 = e0 + dx;
-          if (signY < 0) dy = Math.max(N - n0, Math.min(S - n0, dy)), n1 = n0 + dy, s1 = s0;
-          else if (signY > 0) dy = Math.max(N - s0, Math.min(S - s0, dy)), n1 = n0, s1 = s0 + dy;
+          if (signX < 0) {
+            dx = Math.max(W - w0, Math.min(E - w0, dx))
+            w1 = w0 + dx
+            e1 = e0;
+          }
+          else if (signX > 0) {
+            dx = Math.max(W - e0, Math.min(E - e0, dx))
+            w1 = w0
+            e1 = e0 + dx;
+          }
+          if (signY < 0) {
+            dy = Math.max(N - n0, Math.min(S - n0, dy))
+            n1 = n0 + dy
+            s1 = s0;
+          }
+          else if (signY > 0) {
+            dy = Math.max(N - s0, Math.min(S - s0, dy))
+            n1 = n0
+            s1 = s0 + dy;
+          }
           break;
         }
         case MODE_CENTER: {
-          if (signX) w1 = Math.max(W, Math.min(E, w0 - dx * signX)), e1 = Math.max(W, Math.min(E, e0 + dx * signX));
-          if (signY) n1 = Math.max(N, Math.min(S, n0 - dy * signY)), s1 = Math.max(N, Math.min(S, s0 + dy * signY));
+          if (signX) {
+            w1 = Math.max(W, Math.min(E, w0 - dx * signX))
+            e1 = Math.max(W, Math.min(E, e0 + dx * signX));
+          }
+          if (signY) {
+            n1 = Math.max(N, Math.min(S, n0 - dy * signY))
+            s1 = Math.max(N, Math.min(S, s0 + dy * signY));
+          }
           break;
+        }
+        default: {
+
         }
       }
 
       if (e1 < w1) {
         signX *= -1;
-        t = w0, w0 = e0, e0 = t;
-        t = w1, w1 = e1, e1 = t;
+        t = w0
+        w0 = e0
+        e0 = t
+
+        t = w1
+        w1 = e1
+        e1 = t
         if (type in flipX) overlay.attr("cursor", cursors[type = flipX[type]]);
       }
 
       if (s1 < n1) {
         signY *= -1;
-        t = n0, n0 = s0, s0 = t;
-        t = n1, n1 = s1, s1 = t;
+        t = n0
+        n0 = s0
+        s0 = t
+        t = n1
+        n1 = s1
+        s1 = t;
         if (type in flipY) overlay.attr("cursor", cursors[type = flipY[type]]);
       }
 
       if (state.selection) selection = state.selection; // May be set by brush.move!
-      if (lockX) w1 = selection[0][0], e1 = selection[1][0];
-      if (lockY) n1 = selection[0][1], s1 = selection[1][1];
+      if (lockX) {
+        w1 = selection[0][0]
+        e1 = selection[1][0];
+      }
+      if (lockY) {
+        n1 = selection[0][1]
+        s1 = selection[1][1];
+      }
 
       state.position = point[0]
       redraw.call(that);
@@ -486,75 +560,6 @@ function brush(dim) {
       if (state.selection) selection = state.selection; // May be set by brush.move (on start)!
       // if (empty(selection)) state.selection = null, redraw.call(that);
       emit.end();
-    }
-
-    function keydowned() {
-      switch (event.keyCode) {
-        case 16: { // SHIFT
-          shifting = signX && signY;
-          break;
-        }
-        case 18: { // ALT
-          if (mode === MODE_HANDLE) {
-            if (signX) e0 = e1 - dx * signX, w0 = w1 + dx * signX;
-            if (signY) s0 = s1 - dy * signY, n0 = n1 + dy * signY;
-            mode = MODE_CENTER;
-            move();
-          }
-          break;
-        }
-        case 32: { // SPACE; takes priority over ALT
-          if (mode === MODE_HANDLE || mode === MODE_CENTER) {
-            if (signX < 0) e0 = e1 - dx; else if (signX > 0) w0 = w1 - dx;
-            if (signY < 0) s0 = s1 - dy; else if (signY > 0) n0 = n1 - dy;
-            mode = MODE_SPACE;
-            overlay.attr("cursor", cursors.selection);
-            move();
-          }
-          break;
-        }
-        default: return;
-      }
-      noevent();
-    }
-
-    function keyupped() {
-      switch (event.keyCode) {
-        case 16: { // SHIFT
-          if (shifting) {
-            lockX = lockY = shifting = false;
-            move();
-          }
-          break;
-        }
-        case 18: { // ALT
-          if (mode === MODE_CENTER) {
-            if (signX < 0) e0 = e1; else if (signX > 0) w0 = w1;
-            if (signY < 0) s0 = s1; else if (signY > 0) n0 = n1;
-            mode = MODE_HANDLE;
-            move();
-          }
-          break;
-        }
-        case 32: { // SPACE
-          if (mode === MODE_SPACE) {
-            if (event.altKey) {
-              if (signX) e0 = e1 - dx * signX, w0 = w1 + dx * signX;
-              if (signY) s0 = s1 - dy * signY, n0 = n1 + dy * signY;
-              mode = MODE_CENTER;
-            } else {
-              if (signX < 0) e0 = e1; else if (signX > 0) w0 = w1;
-              if (signY < 0) s0 = s1; else if (signY > 0) n0 = n1;
-              mode = MODE_HANDLE;
-            }
-            overlay.attr("cursor", cursors[type]);
-            move();
-          }
-          break;
-        }
-        default: return;
-      }
-      noevent();
     }
   }
 
