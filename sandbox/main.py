@@ -58,6 +58,7 @@ for l in layers3:
 
     svg = l['shape'].svg()
     svg = re.sub('fill=".+?"', 'fill="{0}"'.format(color), svg)
+    svg = re.sub('stroke=".+?"', 'stroke="None"', svg)
 
     svg = re.sub('^<g>', '<g id="%s">' % (l['frame']), svg)
     svg_out.append(svg)

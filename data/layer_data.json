@@ -1,7 +1,7 @@
 [
   {"zone": "base", "frames": [1], "name": "Base", "years": []},
   {"zone": "1", "frames": [2,3], "name": "West Cove", "years": [1803, 1863]},
-  {"zone": "2", "frames": [4,5], "name": "Mill Pond", "years": [1807, 1829],
+  {"zone": "2", "frames": [4,5], "name": "Mill Pond", "years": [1807, 1829]},
   {"zone": "3", "frames": [6,8], "name": "South Cove", "years": [1806, 1843]},
   {"zone": "4", "frames": [9,12], "name": "East Cove", "years": [1823, 1874]},
   {"zone": "5", "frames": [13,20], "name": "South Boston", "years": [1836, 2016]},

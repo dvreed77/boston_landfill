@@ -2,12 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## TODOS:
-- Properly color shapes
-- Properly label shapes
-- Remove small shapes after subtracting
-  - use area of shape
+- Webapp
 - Geolocate
 
+
+## [0.0.1] - 2017-10-09
+### Working
+- About 3/4 done manually editing shapes. Enough to convert SVG to geojson and work on webapp a bit.
 
 ## [0.0.1] - 2017-10-09
 ### Working

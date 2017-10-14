@@ -119,7 +119,28 @@ for interior in shape.interiors:
 ```
 
 
-### Convert contours to GeoJSON
+### Convert SVG to Polygons
+
+In order to convert Shapely shapes to SVG, I manually built my own SVG path elements, similar to this:
+
+```python
+from shapely.geometry import Polygon, MultiPolygon
+from xml.dom import minidom, Node
+from svg.path import parse_path as parse_svg_path
+
+svg_doc = minidom.parse("data/svg_out.svg")
+
+
+def parse_path(path):
+    points = map(lambda x: (x.start.real, x.start.imag), parse_svg_path(path.getAttribute('d')))
+    return points
+
+points = parse_path(svg_doc.getElementsByTagName("path")[0])
+Polygon(points)
+```
+
+
+### Convert Polygons to GeoJSON
 
 ```python
 from shapely.geometry import mapping
