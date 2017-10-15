@@ -13,26 +13,46 @@ export default class GeoMap extends Component {
     }
   }
 
-
   componentWillMount() {
-    fetch('/out.geojson')
-      .then(d=>d.json())
-      .then(d=>{
-        this.setState({mapData:d}, this.draw)
+
+    const urls = [
+      '/out.geojson',
+      '/layer_data.json'
+    ]
+
+    // separate function to make code more clear
+    const grabContent = url => fetch(url)
+      .then(res => res.json())
+
+    Promise
+      .all(urls.map(grabContent))
+      .then(([mapData, layerData]) => {
+
+        console.log(mapData, layerData)
+
+        this.setState({mapData}, this.draw)
       })
+
+
+      //
+      //   fetch('/out.geojson')
+      // .then(d=>d.json())
+      // .then(d=>{
+      //   this.setState({mapData:d}, this.draw)
+      // })
   }
 
   componentDidMount() {
     this.draw(this.state.svg)
   }
 
-  draw(ref) {
+  draw() {
     const {mapData} = this.state
 
     console.log('MAPDATA', mapData)
-    if (!ref) return
+    if (!mapData) return
 
-    const svg = d3.select(ref)
+    const svg = d3.select(this.svg)
 
     // const projection = d3.geoAlbers()
       const projection = d3.geoIdentity()
@@ -43,40 +63,15 @@ export default class GeoMap extends Component {
       .append('g')
       .attr('transform', 'translate(15,20)')
 
-    const features = {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "properties": {"layer": 5, "region": "logan_airport"},
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-              [0,0], [10,0], [12,10], [2,10], [0,0]
-            ]]
-          }
-        },
-        {
-          "type": "Feature",
-          "properties": {"layer": 5, "region": "logan_airport"},
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-              [0,15], [5,15], [5,20], [0,20], [0,15]
-            ]]
-          }
-        }
-      ]
-    }
+    const features = mapData
 
-    // d3.geoPath()
-    var path = d3.geoPath().projection(projection);
-    var bounds = path.bounds(features);
+    const path = d3.geoPath().projection(projection),
+      bounds = path.bounds(features);
 
 
-    var scale = .95 / Math.max((bounds[1][0] - bounds[0][0]) / 500,
+    const scale = .95 / Math.max((bounds[1][0] - bounds[0][0]) / 500,
       (bounds[1][1] - bounds[0][1]) / 500);
-    var transl = [(500 - scale * (bounds[1][0] + bounds[0][0])) / 2,
+    const transl = [(500 - scale * (bounds[1][0] + bounds[0][0])) / 2,
       (500 - scale * (bounds[1][1] + bounds[0][1])) / 2];
     projection.scale(scale).translate(transl);
 
@@ -87,6 +82,8 @@ export default class GeoMap extends Component {
       .enter()
       .append("path")
       .attr('d', path)
+
+
 
   }
 
