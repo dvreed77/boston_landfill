@@ -28,18 +28,20 @@ export default class GeoMap extends Component {
       .all(urls.map(grabContent))
       .then(([mapData, layerData]) => {
 
-        console.log(mapData, layerData)
+        mapData.features.forEach(f=>{
+
+          const {layer} = f.properties
+
+          const zone = layerData.filter(_=>{
+            if (layer === 'base' && _.zone === 'base') return true
+            return (+layer+1 >= _.frames[0]) && (+layer+1 <= _.frames[1])
+          })
+
+          f.properties.zone = zone[0]
+        })
 
         this.setState({mapData}, this.draw)
       })
-
-
-      //
-      //   fetch('/out.geojson')
-      // .then(d=>d.json())
-      // .then(d=>{
-      //   this.setState({mapData:d}, this.draw)
-      // })
   }
 
   componentDidMount() {
@@ -51,6 +53,10 @@ export default class GeoMap extends Component {
 
     console.log('MAPDATA', mapData)
     if (!mapData) return
+
+    const year = 1906
+
+
 
     const svg = d3.select(this.svg)
 
@@ -64,6 +70,27 @@ export default class GeoMap extends Component {
       .attr('transform', 'translate(15,20)')
 
     const features = mapData
+
+    features.features = features.features.sort((a,b)=>{
+      if (a.properties.zone.zone === 'base') return 1
+      if (b.properties.zone.zone === 'base') return -1
+
+      return b.properties.zone.zone - a.properties.zone.zone
+    })
+
+    console.log(features.features)
+
+    features.features.forEach(f=>{
+      const {years} = f.properties.zone
+      if (f.properties.zone.zone === 'base') {
+        console.log('FOUND BASE')
+        f.properties.color = 'green'
+      } else if (year >= years[0]) {
+        f.properties.color = 'orange'
+      } else {
+        f.properties.color = 'yellow'
+      }
+    })
 
     const path = d3.geoPath().projection(projection),
       bounds = path.bounds(features);
@@ -82,9 +109,7 @@ export default class GeoMap extends Component {
       .enter()
       .append("path")
       .attr('d', path)
-
-
-
+      .attr('fill', d=>d.properties.color)
   }
 
   render() {

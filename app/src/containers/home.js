@@ -7,7 +7,7 @@ import {
   incrementAsync,
   decrement,
   decrementAsync
-} from '../../modules/counter'
+} from '../modules/counter'
 
 import Button from 'antd/lib/button'
 import { TimePicker } from 'antd';

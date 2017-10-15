@@ -2,10 +2,16 @@ import React, {Component} from 'react'
 import * as d3 from 'd3'
 import scrub from '../utils/scrub'
 
-export default class App2 extends Component {
+export default class Timeline extends Component {
 
-  state = {
-    cursorPosition: 0,
+  constructor(props) {
+    super(props);
+
+    this.draw = this.draw.bind(this)
+
+    this.state = {
+      cursorPosition: 0
+    }
   }
 
   componentDidMount() {
@@ -13,36 +19,27 @@ export default class App2 extends Component {
   }
 
   draw(ref) {
-
+    const {onChange} = this.props
     const svg = d3.select(ref)
 
 
     const brush = scrub()
-      .on("brush", d=>console.log('logging brush'))
+      .on("brush", d=>{
+        // console.log(d3.mouse(this)[0])
+        if (d3.event.sourceEvent) { // not a programmatic event
+
+          const x = d3.mouse(this.svg)[0]
+          // console.log(d3.mouse(this.svg)[0]);
+          // console.log(d3.event, this)
+          onChange(x<400 ? 1850 : 1906)
+        }
+
+      })
 
     svg
       .append("g")
       .attr("class", "slider")
       .call(brush);
-
-    // var overlay = svg
-    //   .append("g")
-    //   .attr("class", "slider")
-    //   .append('rect')
-    //   .attr("class", "overlay")
-    //   .attr("pointer-events", "all")
-    //   .attr("cursor", "crosshair")
-    //   .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)")
-    //   .attr("fill", "none")
-    //   .attr("pointer-events", "all")
-    //   .attr("x", 0)
-    //   .attr("y", 0)
-    //   .attr("width", 500)
-    //   .attr("height", 500)
-    //   .on("mousedown.dave", d=>console.log('mousedown', event))
-
-
-
   }
 
   render() {
