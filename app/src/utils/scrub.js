@@ -262,7 +262,7 @@ function brush(dim) {
       selection = local(this).selection,
       position = local(this).position
 
-    console.log('REDRAW', position)
+    // console.log('REDRAW', position)
 
     group.selectAll(".scrubhandle")
       // .style("display", null)
