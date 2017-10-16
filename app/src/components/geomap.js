@@ -44,6 +44,13 @@ export default class GeoMap extends Component {
   updateYear(year) {
     const {mapData} = this.props
 
+    console.log('YEAR', year)
+    const filterFunc = f=>{
+      const {years} = f.properties.zone
+      console.log(year >= years[0])
+      return year >= years[0]
+    }
+
     mapData.features.forEach(f=>{
       const {years} = f.properties.zone
       if (f.properties.zone.zone === 'base') {
@@ -55,12 +62,19 @@ export default class GeoMap extends Component {
       }
     })
 
+    var t = d3.transition()
+      .delay(1000)
+      .duration(750);
+
     const svg = d3.select(this.svg)
 
     svg
       .selectAll("path")
-      .data(mapData.features)
-      .attr('fill', d=>d.properties.color)
+      .filter(filterFunc)
+      // .data(mapData.features)
+      .attr('fill', 'orange')
+      // .transition(t)
+      // .attr('fill', 'lightgreen')
 
   }
 
@@ -82,9 +96,9 @@ export default class GeoMap extends Component {
       if (f.properties.zone.zone === 'base') {
         f.properties.color = 'green'
       } else if (year >= years[0]) {
-        f.properties.color = 'orange'
-      } else {
         f.properties.color = 'yellow'
+      } else {
+        f.properties.color = 'blue'
       }
     })
 
