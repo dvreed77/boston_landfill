@@ -42,27 +42,11 @@ export default class GeoMap extends Component {
   }
 
   updateYear(year) {
-    const {mapData} = this.props
-
-    console.log('YEAR', year)
     const filterFunc = f=>{
-      const {years} = f.properties.zone
-      console.log(year >= years[0])
-      return year >= years[0]
+      return f.properties.zone.zone !== 'base'
     }
 
-    mapData.features.forEach(f=>{
-      const {years} = f.properties.zone
-      if (f.properties.zone.zone === 'base') {
-        f.properties.color = 'green'
-      } else if (year >= years[0]) {
-        f.properties.color = 'orange'
-      } else {
-        f.properties.color = 'yellow'
-      }
-    })
-
-    var t = d3.transition()
+    const t = d3.transition()
       .delay(1000)
       .duration(750);
 
@@ -71,6 +55,9 @@ export default class GeoMap extends Component {
     svg
       .selectAll("path")
       .filter(filterFunc)
+      .attr('visibility', f=>{
+        return year >= f.properties.zone.years[0] ? 'visible' : 'hidden'
+      })
       // .data(mapData.features)
       .attr('fill', 'orange')
       // .transition(t)
@@ -123,7 +110,6 @@ export default class GeoMap extends Component {
   render() {
     const {mapData} = this.props
 
-    // console.log('RNEDER', mapData)
     return (
       <div>
         <svg width={500} height={500} ref={(svg) => { this.svg = svg}}/>

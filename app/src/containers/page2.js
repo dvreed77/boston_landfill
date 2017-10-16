@@ -8,7 +8,8 @@ class Page extends React.Component {
     this.onChange = this.onChange.bind(this)
     this.state = {
       year: 1906,
-      mapData: {}
+      mapData: {},
+      layerData: []
     }
   }
 
@@ -45,7 +46,7 @@ class Page extends React.Component {
           return b.properties.zone.zone - a.properties.zone.zone
         })
 
-        this.setState({mapData})
+        this.setState({mapData, layerData})
       })
   }
 
@@ -57,13 +58,14 @@ class Page extends React.Component {
   }
 
   render() {
-    const {year, mapData} = this.state
+    const {year, mapData, layerData} = this.state
 
-    // console.log('Features in MapData', 'features' in mapData)
+    const layerData_ = layerData.filter(d=>d.zone !== 'base')
+
     return (
       <div>
         Current Year: {year}
-        <Timeline onChange={this.onChange}/>
+        <Timeline onChange={this.onChange} layerData={layerData_}/>
         <Map year={year} mapData={mapData}/>
       </div>
     );
