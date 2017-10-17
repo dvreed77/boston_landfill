@@ -3,6 +3,11 @@ import * as d3 from 'd3'
 
 export default class GeoMap extends Component {
 
+  static defaultProps = {
+    width: 800,
+    height: 800
+  }
+
   constructor(props) {
     super(props);
 
@@ -56,18 +61,19 @@ export default class GeoMap extends Component {
       .selectAll("path")
       .filter(filterFunc)
       .attr('visibility', f=>{
-        return year >= f.properties.zone.years[0] ? 'visible' : 'hidden'
+        return f.properties.visible(year) ? 'visible' : 'hidden'
       })
       // .data(mapData.features)
       .attr('fill', 'orange')
-      // .transition(t)
-      // .attr('fill', 'lightgreen')
+      .filter(f=>f.properties.visible(year))
+      .transition(t)
+      .attr('fill', 'lightgreen')
 
   }
 
   draw(mapData) {
     const {path, projection} = this.state
-    const {year} = this.props
+    const {width, height} = this.props
 
     // console.log('MAPDATA', mapData)
     if (!('features' in mapData)) return
@@ -78,23 +84,23 @@ export default class GeoMap extends Component {
       .append('g')
       .attr('transform', 'translate(15,20)')
 
-    mapData.features.forEach(f=>{
-      const {years} = f.properties.zone
-      if (f.properties.zone.zone === 'base') {
-        f.properties.color = 'green'
-      } else if (year >= years[0]) {
-        f.properties.color = 'yellow'
-      } else {
-        f.properties.color = 'blue'
-      }
-    })
+    // mapData.features.forEach(f=>{
+    //   const {years} = f.properties.zone
+    //   if (f.properties.zone.zone === 'base') {
+    //     f.properties.color = 'green'
+    //   } else if (year >= years[0]) {
+    //     f.properties.color = 'yellow'
+    //   } else {
+    //     f.properties.color = 'blue'
+    //   }
+    // })
 
     const bounds = path.bounds(mapData)
 
-    const scale = .95 / Math.max((bounds[1][0] - bounds[0][0]) / 500,
-      (bounds[1][1] - bounds[0][1]) / 500);
-    const transl = [(500 - scale * (bounds[1][0] + bounds[0][0])) / 2,
-      (500 - scale * (bounds[1][1] + bounds[0][1])) / 2];
+    const scale = 1 / Math.max((bounds[1][0] - bounds[0][0]) / width,
+      (bounds[1][1] - bounds[0][1]) / height);
+    const transl = [(width - scale * (bounds[1][0] + bounds[0][0])) / 2,
+      (height - scale * (bounds[1][1] + bounds[0][1])) / 2];
     projection.scale(scale).translate(transl);
 
 
@@ -104,15 +110,20 @@ export default class GeoMap extends Component {
       .enter()
       .append("path")
       .attr('d', path)
-      .attr('fill', d=>d.properties.color)
+      .attr('visibility', d=>{
+        return d.properties.zone.zone === 'base' ? 'visible' : 'hidden'
+      })
+      .attr('fill', d=>{
+        return d.properties.zone.zone === 'base' ? 'green' : 'orange'
+      })
   }
 
   render() {
-    const {mapData} = this.props
+    const {mapData, width, height} = this.props
 
     return (
       <div>
-        <svg width={500} height={500} ref={(svg) => { this.svg = svg}}/>
+        <svg width={width} height={height} ref={(svg) => { this.svg = svg}}/>
       </div>
     )
   }

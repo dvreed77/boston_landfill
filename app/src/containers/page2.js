@@ -1,6 +1,7 @@
 import React from 'react'
 import Timeline from '../components/timeline'
 import Map from '../components/geomap'
+import * as d3 from 'd3'
 
 class Page extends React.Component {
   constructor(props) {
@@ -27,6 +28,8 @@ class Page extends React.Component {
       .all(urls.map(grabContent))
       .then(([mapData, layerData]) => {
 
+        // const baseLayer = mapData.features.filter()
+
         mapData.features.forEach(f=>{
 
           const {layer} = f.properties
@@ -37,6 +40,16 @@ class Page extends React.Component {
           })
 
           f.properties.zone = zone[0]
+
+          const scale = d3.scaleLinear()
+            .range(f.properties.zone.years)
+            .domain(f.properties.zone.frames)
+
+          f.properties.year = scale(+layer+1)
+
+          f.properties.visible = year => {
+            return year > f.properties.year
+          }
         })
 
         mapData.features = mapData.features.sort((a,b)=>{
@@ -45,6 +58,8 @@ class Page extends React.Component {
 
           return b.properties.zone.zone - a.properties.zone.zone
         })
+
+
 
         this.setState({mapData, layerData})
       })
