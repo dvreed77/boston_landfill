@@ -16,7 +16,7 @@ class Page extends React.Component {
 
   componentWillMount() {
     const urls = [
-      '/out.geojson',
+      '/out_v2.geojson',
       '/layer_data.json'
     ]
 

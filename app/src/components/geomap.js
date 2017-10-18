@@ -65,9 +65,9 @@ export default class GeoMap extends Component {
       })
       // .data(mapData.features)
       .attr('fill', 'orange')
-      .filter(f=>f.properties.visible(year))
-      .transition(t)
-      .attr('fill', 'lightgreen')
+      // .filter(f=>f.properties.visible(year))
+      // .transition(t)
+      // .attr('fill', 'lightgreen')
 
   }
 
