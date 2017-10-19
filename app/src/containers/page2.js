@@ -2,6 +2,7 @@ import React from 'react'
 import Timeline from '../components/timeline'
 import Map from '../components/geomap'
 import * as d3 from 'd3'
+import Palette from "../components/palette";
 
 class Page extends React.Component {
   constructor(props) {
@@ -58,9 +59,6 @@ class Page extends React.Component {
 
           return b.properties.zone.zone - a.properties.zone.zone
         })
-
-
-
         this.setState({mapData, layerData})
       })
   }
@@ -80,6 +78,7 @@ class Page extends React.Component {
     return (
       <div>
         Current Year: {year}
+        <Palette nColors={13}/>
         <Timeline onChange={this.onChange} layerData={layerData_}/>
         <Map year={year} mapData={mapData}/>
       </div>
