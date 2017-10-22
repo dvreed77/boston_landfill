@@ -90,7 +90,6 @@ class Page extends React.Component {
   }
 
   onChange(year) {
-    // console.log('dave', year)
     this.setState({
       year
     })
@@ -101,11 +100,9 @@ class Page extends React.Component {
 
     const layerData_ = layerData.filter(d=>d.zone !== 'base')
 
-    console.log(landfillLayers)
     return (
       <div>
-        Current Year: {year}
-
+        <h3>{year}</h3>
         <Palette nColors={13}/>
         <Timeline onChange={this.onChange} layerData={layerData_}/>
         <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>

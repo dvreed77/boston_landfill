@@ -26,7 +26,6 @@ export default class GeoMap extends Component {
   }
 
   componentWillMount() {
-    console.log('COMPONENT WILL MOUNT', this.props)
     const projection = d3.geoIdentity()
       .scale(1)
       .translate([0,0])
@@ -38,7 +37,6 @@ export default class GeoMap extends Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log('componentWillReceiveProps', this.props, props)
     const {baseLayer, landfillLayers} = props
 
     if ('features' in baseLayer && 'features' in landfillLayers) {
@@ -54,13 +52,6 @@ export default class GeoMap extends Component {
   }
 
   componentWillUpdate(nextProps) {
-    // console.log('componentWillUpdate', this.props, nextProps)
-    // const {baseLayer, landfillLayers, year} = nextProps
-    //
-    // if ('features' in landfillLayers) this.draw(landfillLayers)
-    // if ('features' in baseLayer) this.drawBase(baseLayer)
-    //
-    // if (year !== this.props.year) this.updateYear(year)
     this.updateYear(nextProps.year)
   }
 
@@ -93,12 +84,6 @@ export default class GeoMap extends Component {
       .attr('visibility', f=>{
         return f.properties.visible(year) ? 'visible' : 'hidden'
       })
-      // .data(mapData.features)
-      // .attr('fill', f=>(`#${f.properties.color}`))
-      // .filter(f=>f.properties.visible(year))
-      // .transition(t)
-      // .attr('fill', 'lightgreen')
-
   }
 
   draw(mapData) {
@@ -107,16 +92,7 @@ export default class GeoMap extends Component {
 
     if (!('features' in mapData)) return
 
-
     const svg = d3.select(this.svg).select('g.layer')
-
-
-    // svg
-    //   .append('g')
-    //   .attr('transform', 'translate(15,20)')
-
-
-
 
     svg
       .selectAll("path.layer")
@@ -129,24 +105,24 @@ export default class GeoMap extends Component {
         let c = d3.hsl(`#${f.properties.color}`)
 
         c.h = (c.h + 2*f.properties.layer_id) % 360;
-        // c.s += (1 - c.s)*f.properties.layer_id/f.properties.nFrames
-        // c.l += (1 - c.l)*f.properties.layer_id/f.properties.nFrames/3
         c.l -= (c.l - 0)*f.properties.layer_id/f.properties.nFrames/5
-
 
         return c + ""
       })
   }
 
   drawBase(mapData) {
-    const {path, projection} = this.state
-    const {width, height} = this.props
+    const {path} = this.state
 
     if (!('features' in mapData)) return
 
-
     const svg = d3.select(this.svg).select('g.base-layer')
 
+    const baseColor = 'green'
+    let fill = d3.hsl(baseColor)
+    let strokeColor = d3.hsl(baseColor)
+
+    strokeColor.s += 0.6
 
     svg
       .selectAll("path.base-layer")
@@ -155,7 +131,9 @@ export default class GeoMap extends Component {
       .append("path")
       .attr('class', 'base-layer')
       .attr('d', path)
-      .attr('fill', 'green')
+      .attr('fill', fill + "")
+      .attr('stroke', strokeColor + "")
+      .attr('stroke-width', 2)
   }
 
   render() {
@@ -164,8 +142,13 @@ export default class GeoMap extends Component {
     return (
       <div>
         <svg width={width+2*svgPad} height={height+2*svgPad} ref={(svg) => { this.svg = svg}}>
+          <defs>
+            <clipPath id="myClip">
+              <rect x={0} y={1} width={width} height={height-2}/>
+            </clipPath>
+          </defs>
           <g transform={`translate(${svgPad}, ${svgPad})`}>
-            <image href="/boston_sat.png" x={-276} y={-266} width={800/996.3*1703.685} />
+            <image href="/boston_sat.png" x={-276} y={-266} width={800/996.3*1703.685} clipPath="url(#myClip)"/>
             <g className="layer" />
             <g className="base-layer" />
           </g>

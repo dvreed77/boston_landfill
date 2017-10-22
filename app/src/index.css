@@ -1,4 +1,3 @@
-@import '~antd/dist/antd.css';
 
 body {
   margin: 0;
@@ -6,9 +5,6 @@ body {
   font-family: sans-serif;
 }
 
-
-text.timeline {
-  /* This value is the OPPOSITE color of our background */
-  fill: black;
-  mix-blend-mode: multiply;
+.x.axis text {
+  font-size: 20px;
 }

@@ -1,12 +1,8 @@
 from shapely.geometry import Polygon, MultiPolygon
-from xml.dom import minidom, Node
 from svg.path import parse_path as parse_svg_path
 from lxml import html
-import lxml.etree as ET
-from lxml import html
-
-# svg_doc = minidom.parse("data/final_prep_out.svg")
-# svg_doc = minidom.parse("data/svg_out_v2.svg")
+from shapely.geometry import mapping
+import json
 
 # fname = "data/final_prep_out.svg"
 fname = "data/svg_out_v2.svg"
@@ -17,8 +13,6 @@ layername = 'Logan Airport'
 
 paths = svg.xpath("//g[@id='%s']//path" % layername.replace(' ', '_'))
 polygons = svg.xpath("//g[@id='%s']//polygon" % layername.replace(' ', '_'))
-
-paths[0].getAttribute('d')
 
 parse_svg_path(paths[0].get('d'))
 
@@ -67,11 +61,11 @@ def parse_layer(layername):
 
 def parse_element(el):
     if el.tag == 'polygon':
-        points = parse_polygon(e)
+        points = parse_polygon(el)
         out = Polygon(points)
 
     elif el.tag == 'path':
-        points = parse_path(e)
+        points = parse_path(el)
         out = Polygon(points)
 
     elif el.tag == 'g':
@@ -90,66 +84,32 @@ def parse_layer2(layername):
 
     zone = layername
 
-    return elements
-    print(elements[0]._Element)
-
     out = {
         'zone': zone,
         'layers': []
     }
 
-    for e in elements:
-        if e.tag == 'polygon':
-            points = parse_polygon(e)
-            out['layers'].append(Polygon(points))
+    for el in elements:
+        l = parse_element(el)
+        out['layers'].append(l)
 
-        elif e.tag == 'path':
-            points = parse_path(e)
-            out['layers'].append(Polygon(points))
-
-        elif e.tag == 'g':
-            polygons = []
-            for el in e.xpath('.//*'):
-                if el.tag == 'polygon':
-                    points = parse_polygon(e)
-                    polygons.append(Polygon(points))
-
-            elif el.tag == 'path':
-                points = parse_path(e)
-                polygons.append(Polygon(points))
-    # svg_paths = svg.xpath("//g[@id='%s']//path" % layername.replace(' ', '_'))
-    # svg_polygons = svg.xpath("//g[@id='%s']//polygon" % layername.replace(' ', '_'))
-    #
-    # polygons = []
-    # for path in svg_paths:
-    #     points = parse_path(path)
-    #     polygons.append(Polygon(points))
-    #
-    # for polygon in svg_polygons:
-    #     points = parse_polygon(polygon)
-    #     polygons.append(Polygon(points))
-    #
-    # return MultiPolygon(polygons)
-
-el = parse_layer2('Charlestown')
-
-el[1].xpath('.//*')
-h = el[0]
-h.tag
-
-h
+    return out
 
 
-def rename_layer(layer):
-    layer = layer.replace('_x39_', '9')
-    layer = layer.replace('_x38_', '8')
-    layer = layer.replace('_x36_', '6')
-    layer = layer.replace('_x35_', '5')
-    layer = layer.replace('_x34_', '4')
-    layer = layer.replace('_x33_', '3')
-    layer = layer.replace('_x32_', '2')
-    layer = layer.replace('_x31_', '1')
-    return layer
+def gen_feature(shape, properties):
+    try:
+        return {
+            "type": "Feature",
+            "properties": properties,
+            "geometry": mapping(shape)
+        }
+    except Exception, e:
+        print(e)
+        return {}
+
+layer_obj = parse_layer2('Base')
+
+layer_obj['layers']
 
 Layers = [
     'Base',
@@ -168,70 +128,19 @@ Layers = [
     'Logan Airport'
 ]
 
-out = []
+features = []
 for layer in Layers:
-    shape = parse_layer(layer)
-    out.append({
-        'zone': layer,
-        'shape': shape
-    })
-
-
-
-
-from shapely.geometry import mapping
-import json
-
-def gen_feature(shape, properties):
-    try:
-        return {
-            "type": "Feature",
-            "properties": properties,
-            "geometry": mapping(shape)
-        }
-    except Exception, e:
-        print(e)
-        return {}
-
-
-
+    layer_obj = parse_layer2(layer)
+    for idx, layer in enumerate(layer_obj['layers']):
+        props = {
+            "zone": layer_obj['zone'],
+            "layer_id": idx
+            }
+        features.append(gen_feature(layer, props))
 
 feature = {
     "type": "FeatureCollection",
-    "features": [gen_feature(x['shape'], {"layer": x['layer']}) for x in out]
+    "features": features
 }
 
-for o in out:
-    print(o['layer'])
-
-out[40]
-
-# json.dump(feature, open('data/out_v2.geojson', 'w'))
-
-gen_feature(out[0]['shape'], {"zone": out[0]["zone"]})
-
-
-# out = []
-# groups = svg_doc.getElementsByTagName("g")
-# for g in groups:
-#     out.append({
-#         'layer': rename_layer(g.getAttribute('id')),
-#         'shape': parse_group(g)
-#     })
-#
-#
-# paths = svg_doc.getElementsByTagName("path")
-# for path in paths:
-#     if path.hasAttribute('id'):
-#         out.append({
-#             'layer': rename_layer(path.getAttribute('id')),
-#             'shape': Polygon(parse_path(path))
-#         })
-#
-# polygons = svg_doc.getElementsByTagName("polygon")
-# for polygon in polygons:
-#     if polygon.hasAttribute('id'):
-#         out.append({
-#             'layer': rename_layer(polygon.getAttribute('id')),
-#             'shape': Polygon(parse_polygon(polygon))
-#         })
+json.dump(feature, open('data/out_v3.geojson', 'w'))

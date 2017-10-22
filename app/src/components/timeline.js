@@ -38,11 +38,13 @@ export default class Timeline extends Component {
     const minYear = d3.min(layerData, d => d.years[0])
     const maxYear = d3.max(layerData, d => d.years[1])
 
+    const height = layerData.length * (barHeight + barPad) + 2*svgPad
+
     xScale
-      .domain([minYear, maxYear])
+      .domain([minYear, 2017])
 
     svg
-      .attr('height', layerData.length * (barHeight + barPad) + 2*svgPad)
+      .attr('height', height)
 
     const brush = scrub()
       // .extent([0, width])
@@ -57,7 +59,8 @@ export default class Timeline extends Component {
       .call(brush)
 
     const xAxis = d3.axisBottom(xScale)
-      .tickSize(3)
+      .tickSizeOuter(6)
+      .tickSizeInner(3)
       .tickPadding(8)
       .tickFormat(d3.format(""))
 
@@ -75,6 +78,7 @@ export default class Timeline extends Component {
       <div>
         <svg width={width + 2*svgPad} ref={svg=>this.svg = svg}>
           <g transform={`translate(${svgPad}, ${svgPad})`}>
+            <g className='x axis' transform={`translate(0, ${height})`}/>
             {layerData.map((zone, idx) => {
               return <rect
                 key={idx}
@@ -106,7 +110,7 @@ export default class Timeline extends Component {
                 {zone.name.replace('_', ' ')}
               </text>
             })}
-            <g className='x axis' transform={`translate(0, ${height})`}/>
+
             <g className="slider" />
           </g>
         </svg>
