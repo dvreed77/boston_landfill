@@ -41,7 +41,7 @@ export default class Timeline extends Component {
     const height = layerData.length * (barHeight + barPad) + 2*svgPad
 
     xScale
-      .domain([minYear, 2017])
+      .domain([minYear-5, 2017])
 
     svg
       .attr('height', height)
@@ -50,7 +50,8 @@ export default class Timeline extends Component {
       // .extent([0, width])
       .on("brush", d => {
         if (d3.event.sourceEvent) { // not a programmatic event
-          const x = d3.mouse(this.svg)[0]
+          //TODO: major hack here to get it to line up
+          const x = d3.mouse(this.svg)[0]-svgPad
           onChange(xScale.invert(x))
         }
       })
@@ -69,8 +70,8 @@ export default class Timeline extends Component {
   }
 
   render() {
-    const {xScale, cursorPosition} = this.state;
-    const {layerData, width, barHeight, barPad, svgPad} = this.props
+    const {xScale} = this.state;
+    const {layerData, width, barHeight, barPad, svgPad, year} = this.props
 
     const height = layerData.length * (barHeight + barPad)
 
@@ -110,7 +111,13 @@ export default class Timeline extends Component {
                 {zone.name.replace('_', ' ')}
               </text>
             })}
-
+            <g transform={`translate(0, 40)`}>
+              <text
+                x={width-20}
+                textAnchor="end"
+                fontSize={50}
+              >{Math.round(year)}</text>
+            </g>
             <g className="slider" />
           </g>
         </svg>

@@ -8,3 +8,13 @@ body {
 .x.axis text {
   font-size: 20px;
 }
+
+.container {
+  width: 80%;
+  margin: 0 auto;
+}
+
+svg {
+  display: block;
+  margin: auto;
+}

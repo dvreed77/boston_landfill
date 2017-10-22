@@ -60,7 +60,7 @@ class App extends React.Component {
 
           d.scale = d3.scaleLinear()
             .range(d.years)
-            .domain([d.nFrames, 0])
+            .domain([d.nFrames-1, 0])
         })
 
         landfillLayers.features.forEach(f=>{
@@ -101,10 +101,9 @@ class App extends React.Component {
     const layerData_ = layerData.filter(d=>d.zone !== 'base')
 
     return (
-      <div>
-        <h3>{year}</h3>
+      <div className="container">
         <Palette nColors={13}/>
-        <Timeline onChange={this.onChange} layerData={layerData_}/>
+        <Timeline onChange={this.onChange} layerData={layerData_} year={year}/>
         <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>
       </div>
     );
