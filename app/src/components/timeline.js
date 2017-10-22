@@ -31,12 +31,11 @@ export default class Timeline extends Component {
   }
 
   draw(layerData) {
-    const {onChange, barHeight, barPad, svgPad, width} = this.props
+    const {onChange, barHeight, barPad, svgPad} = this.props
     const {xScale} = this.state
     const svg = d3.select(this.svg)
 
     const minYear = d3.min(layerData, d => d.years[0])
-    const maxYear = d3.max(layerData, d => d.years[1])
 
     const height = layerData.length * (barHeight + barPad) + 2*svgPad
 

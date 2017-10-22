@@ -174,10 +174,6 @@ export default class GeoMap extends Component {
   }
 
   updateYear(year) {
-    const t = d3.transition()
-      .delay(1000)
-      .duration(750);
-
     const svg = d3.select(this.svg)
 
     svg

@@ -2,8 +2,8 @@ import React from 'react'
 import Timeline from './components/timeline'
 import Map from './components/geomap'
 import * as d3 from 'd3'
-import Palette from "./components/palette"
-import {merge, find} from 'lodash'
+import {find} from 'lodash'
+import ReactModal from 'react-modal'
 
 class App extends React.Component {
   constructor(props) {
@@ -13,8 +13,12 @@ class App extends React.Component {
       year: 1906,
       baseLayer: {},
       landfillLayers: {},
-      layerData: []
-    }
+      layerData: [],
+      showModal: false
+    };
+
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
   componentWillMount() {
@@ -89,6 +93,14 @@ class App extends React.Component {
       })
   }
 
+  handleOpenModal () {
+    this.setState({ showModal: true });
+  }
+
+  handleCloseModal () {
+    this.setState({ showModal: false });
+  }
+
   onChange(year) {
     this.setState({
       year
@@ -96,12 +108,48 @@ class App extends React.Component {
   }
 
   render() {
-    const {year, landfillLayers, layerData, baseLayer} = this.state
+    const {year, landfillLayers, layerData, baseLayer, showModal} = this.state
 
     const layerData_ = layerData.filter(d=>d.zone !== 'base')
 
     return (
       <div className="container">
+        <div className='header'>
+          <div className='item'>
+            <a href='/'>dvreed.com</a>
+          </div>
+          <div className='item button' onClick={this.handleOpenModal}>
+            About
+          </div>
+        </div>
+        <ReactModal
+          isOpen={showModal}
+          contentLabel="Minimal Modal Example"
+          style={{
+            content: {
+              width: '50%',
+              left: '25%',
+              height: 300
+            }
+          }}
+        >
+          <div>
+            <p>If you didn't know, Boston was once a tiny peninsula.</p>
+
+            <p>Starting in the early 19th century Boston started to take shape into what you see now.</p>
+
+            <p>I was inspired to create this app when a friend of mine posted a GIF she found from Boston College, which can be found here. I became frustrated because it was moving too fast for me to see all the changes that were taking place and I wanted to be able to scrub through the animation.</p>
+          </div>
+          <button onClick={this.handleCloseModal}>Close Modal</button>
+        </ReactModal>
+
+        <div className='title'>
+          <h1>Boston Landfill</h1>
+          <div>
+            an exploration of how Boston grew from a tiny peninsula to what you see today.
+          </div>
+        </div>
+
         <Timeline onChange={this.onChange} layerData={layerData_} year={year}/>
         <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>
       </div>
