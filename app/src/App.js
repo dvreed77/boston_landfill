@@ -102,7 +102,6 @@ class App extends React.Component {
 
     return (
       <div className="container">
-        <Palette nColors={13}/>
         <Timeline onChange={this.onChange} layerData={layerData_} year={year}/>
         <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>
       </div>

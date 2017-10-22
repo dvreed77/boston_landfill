@@ -1,6 +1,69 @@
 import React, {Component} from 'react'
 import * as d3 from 'd3'
 
+
+function wrap(text, width) {
+  text.each(function() {
+    var text = d3.select(this),
+      words = text.text().split(/\s+/).reverse(),
+      word,
+      line = [],
+      lineNumber = 0,
+      lineHeight = 1.1, // ems
+      y = text.attr("y"),
+      dy = parseFloat(text.attr("dy")),
+      tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
+}
+
+function relax(nodes, spacing=120, n=0) {
+  let again = false;
+
+  if (n > 100) return
+  nodes.forEach(n1 => {
+    nodes.forEach(n2 => {
+      if (n1 === n2) return
+      const dx = (n2.cx - n1.cx),
+        dy = (n2.cy - n1.cy),
+        dd = Math.sqrt(dx*dx + dy*dy)
+      if (dd < spacing) {
+        again = true
+
+        console.log(n1.name, n2.name, dd)
+
+        const dd1 = spacing - dd + 10,
+          dx1 = dx*dd1/dd,
+          dy1 = dy*dd1/dd
+
+        n2.cx += dx1/2
+        n1.cx -= dx1/2
+
+        n2.cy += dy1/2
+        n1.cy -= dy1/2
+      }
+    })
+  })
+
+  // Adjust our line leaders here
+  // so that they follow the labels.
+  if(again) {
+    relax(nodes, spacing, n+1)
+  //   setTimeout(()=>relax(nodes, spacing, n+1),1000)
+  }
+}
+
+
+
 export default class GeoMap extends Component {
 
   static defaultProps = {
@@ -14,6 +77,8 @@ export default class GeoMap extends Component {
 
     this.setupBounds = this.setupBounds.bind(this)
     this.drawBase = this.drawBase.bind(this)
+    this.drawPoints = this.drawPoints.bind(this)
+
 
     this.updateYear = this.updateYear.bind(this)
 
@@ -21,7 +86,8 @@ export default class GeoMap extends Component {
       mapData: null,
       projection: null,
       path: null,
-      bounds: []
+      bounds: [],
+      namePts: []
     }
   }
 
@@ -39,6 +105,8 @@ export default class GeoMap extends Component {
   componentWillReceiveProps(props) {
     const {baseLayer, landfillLayers} = props
 
+    if (baseLayer === this.props.baseLayer && landfillLayers === this.props.landfillLayers) return
+
     if ('features' in baseLayer && 'features' in landfillLayers) {
       const mapData = {
         "type": "FeatureCollection",
@@ -51,8 +119,10 @@ export default class GeoMap extends Component {
     if ('features' in landfillLayers) this.draw(landfillLayers)
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUpdate(nextProps, nextState) {
     this.updateYear(nextProps.year)
+
+    if (nextState.namePts.length) this.drawPoints(nextState.namePts)
   }
 
   setupBounds(mapData) {
@@ -67,8 +137,39 @@ export default class GeoMap extends Component {
       (height - scale * (bounds[1][1] + bounds[0][1])) / 2];
     projection.scale(scale).translate(transl);
 
+    const center = {
+      cx: (bounds[1][0]+bounds[0][0])/2 * scale,
+      cy: (bounds[1][1]+bounds[0][1])/2 * scale
+    }
+
+    console.log(center)
+
+
+    const namePts = d3.nest()
+      .key(function(d) { return d.properties.name; })
+      .entries(mapData.features)
+      .map(d=>{
+        const bounds = path.bounds({
+          "type": "FeatureCollection",
+          "features": d.values
+        })
+
+        const namePt = {
+          name: d.key,
+          cx: (bounds[1][0]+bounds[0][0])/2,
+          cy: (bounds[1][1]+bounds[0][1])/2
+        }
+
+        return namePt
+      })
+      .filter(d=>d.name !== 'undefined')
+
+
+    relax(namePts)
+
     this.setState({
-      projection
+      projection,
+      namePts
     })
   }
 
@@ -87,7 +188,7 @@ export default class GeoMap extends Component {
   }
 
   draw(mapData) {
-    const {path, projection} = this.state
+    const {path, namePts} = this.state
     const {width, height} = this.props
 
     if (!('features' in mapData)) return
@@ -109,6 +210,9 @@ export default class GeoMap extends Component {
 
         return c + ""
       })
+
+
+
   }
 
   drawBase(mapData) {
@@ -116,7 +220,7 @@ export default class GeoMap extends Component {
 
     if (!('features' in mapData)) return
 
-    const svg = d3.select(this.svg).select('g.base-layer')
+    const svg = d3.select(this.svg)
 
     const baseColor = 'green'
     let fill = d3.hsl(baseColor)
@@ -125,6 +229,7 @@ export default class GeoMap extends Component {
     strokeColor.s += 0.6
 
     svg
+      .select('g.base-layer')
       .selectAll("path.base-layer")
       .data(mapData.features)
       .enter()
@@ -134,6 +239,59 @@ export default class GeoMap extends Component {
       .attr('fill', fill + "")
       .attr('stroke', strokeColor + "")
       .attr('stroke-width', 2)
+  }
+
+  drawPoints(namePts) {
+
+    const svg = d3.select(this.svg)
+
+    const textStyle = {
+      fontSize: 30,
+      fontWeight: 500
+    }
+
+    svg
+      .select('g.points-layer')
+      .selectAll('g.name-pts.bg')
+      .data(namePts)
+      .enter()
+      .append('g')
+      .attr('class', 'name-pts bg')
+      .attr('transform', d=>`translate(${d.cx}, ${d.cy})`)
+      .append('text')
+      .attr('font-size', textStyle.fontSize)
+      .attr('font-weight', textStyle.fontWeight)
+      .attr('fill', 'white')
+      .attr('stroke', 'rgba(255,255,255,.6)')
+      .attr('stroke-width', 5)
+      .attr('stroke-linejoin', "round")
+      .attr('text-anchor', 'middle')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('dx', 0)
+      .attr('dy', 0)
+      .text(d=>d.name.replace('_', ' '))
+      .call(wrap, 100);
+
+    svg
+      .select('g.points-layer')
+      .selectAll('g.name-pts.fg')
+      .data(namePts)
+      .enter()
+      .append('g')
+      .attr('class', 'name-pts fg')
+      .attr('transform', d=>`translate(${d.cx}, ${d.cy})`)
+      .append('text')
+      .attr('fill', 'black')
+      .attr('font-size', textStyle.fontSize)
+      .attr('font-weight', textStyle.fontWeight)
+      .attr('text-anchor', 'middle')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('dx', 0)
+      .attr('dy', 0)
+      .text(d=>d.name.replace('_', ' '))
+      .call(wrap, 100);
   }
 
   render() {
@@ -151,6 +309,7 @@ export default class GeoMap extends Component {
             <image href="/boston_sat.png" x={-276} y={-266} width={800/996.3*1703.685} clipPath="url(#myClip)"/>
             <g className="layer" />
             <g className="base-layer" />
+            <g className="points-layer" />
           </g>
         </svg>
       </div>
