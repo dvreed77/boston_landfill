@@ -46,17 +46,17 @@ export default class Palette extends Component {
       .attr('width', nColors*rectWidth)
       .attr('height', rectWidth)
 
-    svg
-      .selectAll('rect.swatch')
-      .data(d3.range(nColors))
-      .enter()
-      .append('rect')
-      .attr('class', 'swatch')
-      .attr('x', d=>d*rectWidth)
-      .attr('y', 'swatch')
-      .attr('width', rectWidth)
-      .attr('height', rectWidth)
-      .attr('fill', d=>piyg(d))
+    // svg
+    //   .selectAll('rect.swatch')
+    //   .data(d3.range(nColors))
+    //   .enter()
+    //   .append('rect')
+    //   .attr('class', 'swatch')
+    //   .attr('x', d=>d*rectWidth)
+    //   .attr('y', 'swatch')
+    //   .attr('width', rectWidth)
+    //   .attr('height', rectWidth)
+    //   .attr('fill', d=>piyg(d))
 
 
 

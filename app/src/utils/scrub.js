@@ -198,7 +198,12 @@ function brush(dim) {
       .attr("cursor", cursors.selection)
       .attr("stroke", "#000")
       .attr("stroke-width", 2)
-      .attr("shape-rendering", "crispEdges");
+      .attr("shape-rendering", "crispEdges")
+      .each(function() {
+        var extent = local(this).extent;
+        select(this)
+          .attr("y2", extent[1][1] - extent[0][1]);
+      });
 
     var handle = group.selectAll(".handle")
       .data(X.handles, function(d) { return d.type; });
@@ -207,7 +212,13 @@ function brush(dim) {
 
     handle.enter().append("rect")
       .attr("class", function(d) { return "handle handle--" + d.type; })
-      .attr("cursor", function(d) { return cursors[d.type]; });
+      .attr("cursor", function(d) { return cursors[d.type]; })
+      .each(function() {
+        //TODO: What is difference between handle and scrubhandle?
+        var extent = local(this).extent;
+        select(this)
+          .attr("height", extent[1][1] - extent[0][1]);
+      });
 
     group
       .each(redraw)
@@ -269,7 +280,7 @@ function brush(dim) {
       .attr("x1", position)
       .attr("x2", position)
       .attr("y1", 0)
-      .attr("y2", 300);
+      // .attr("y2", 300);
 
     if (selection) {
       // group.selectAll(".selection")

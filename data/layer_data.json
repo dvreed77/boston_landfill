@@ -37,14 +37,14 @@
 		"zone": "5",
 		"frames": [13, 20],
 		"name": "South Boston",
-		"years": [1836, 2016],
+		"years": [1836, 1940],
 		"color": "F0B273"
 	},
 	{
 		"zone": "6",
 		"frames": [21, 24],
 		"name": "South Bay",
-		"years": [1850, 2016],
+		"years": [1840, 1860],
 		"color": "DDEEA7"
 	},
 	{
@@ -72,7 +72,7 @@
 		"zone": "10",
 		"frames": [40, 44],
 		"name": "East Boston",
-		"years": [1880, 2016],
+		"years": [1880, 1970],
 		"color": "BADCA7"
 	},
 	{

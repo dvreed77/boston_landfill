@@ -2,7 +2,8 @@ import React from 'react'
 import Timeline from '../components/timeline'
 import Map from '../components/geomap'
 import * as d3 from 'd3'
-import Palette from "../components/palette";
+import Palette from "../components/palette"
+import {merge, find} from 'lodash'
 
 class Page extends React.Component {
   constructor(props) {
@@ -10,14 +11,15 @@ class Page extends React.Component {
     this.onChange = this.onChange.bind(this)
     this.state = {
       year: 1906,
-      mapData: {},
+      baseLayer: {},
+      landfillLayers: {},
       layerData: []
     }
   }
 
   componentWillMount() {
     const urls = [
-      '/out_v2.geojson',
+      '/out_v3.geojson',
       '/layer_data.json'
     ]
 
@@ -29,24 +31,47 @@ class Page extends React.Component {
       .all(urls.map(grabContent))
       .then(([mapData, layerData]) => {
 
-        // const baseLayer = mapData.features.filter()
+        const baseLayer = {
+          "type": "FeatureCollection",
+          "features": mapData.features.filter(f=>f.properties.zone === 'Base')
+        }
 
-        mapData.features.forEach(f=>{
+        const landfillLayers = {
+          "type": "FeatureCollection",
+          "features": mapData.features.filter(f=>f.properties.zone !== 'Base')
+        }
 
-          const {layer} = f.properties
+        layerData.forEach(d=>d.name = d.name.replace(' ', '_'))
+
+        console.log(layerData, baseLayer, landfillLayers)
+
+        var entries = d3.nest()
+          .key(function(d) { return d.properties.zone; })
+          .entries(landfillLayers.features)
+          .map(d=>({
+            name: d.key,
+            nFrames: d.values.length
+          }));
+
+
+        layerData.forEach(d=>{
+          const t = find(entries, {'name': d.name})
+          Object.assign(d, t)
+
+          d.scale = d3.scaleLinear()
+            .range(d.years)
+            .domain([d.nFrames, 0])
+        })
+
+        landfillLayers.features.forEach(f=>{
 
           const zone = layerData.filter(_=>{
-            if (layer === 'base' && _.zone === 'base') return true
-            return (+layer+1 >= _.frames[0]) && (+layer+1 <= _.frames[1])
+            return f.properties.zone === _.name.replace(' ', '_')
           })
 
-          f.properties.zone = zone[0]
+          f.properties = Object.assign({}, f.properties, zone[0])
 
-          const scale = d3.scaleLinear()
-            .range(f.properties.zone.years)
-            .domain(f.properties.zone.frames)
-
-          f.properties.year = scale(+layer+1)
+          f.properties.year = f.properties.scale(f.properties.layer_id)
 
           f.properties.visible = year => {
             return year > f.properties.year
@@ -59,7 +84,8 @@ class Page extends React.Component {
 
           return b.properties.zone.zone - a.properties.zone.zone
         })
-        this.setState({mapData, layerData})
+
+        this.setState({landfillLayers, baseLayer, layerData})
       })
   }
 
@@ -71,16 +97,18 @@ class Page extends React.Component {
   }
 
   render() {
-    const {year, mapData, layerData} = this.state
+    const {year, landfillLayers, layerData, baseLayer} = this.state
 
     const layerData_ = layerData.filter(d=>d.zone !== 'base')
 
+    console.log(landfillLayers)
     return (
       <div>
         Current Year: {year}
+
         <Palette nColors={13}/>
         <Timeline onChange={this.onChange} layerData={layerData_}/>
-        <Map year={year} mapData={mapData}/>
+        <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>
       </div>
     );
   }

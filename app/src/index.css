@@ -5,3 +5,10 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+
+text.timeline {
+  /* This value is the OPPOSITE color of our background */
+  fill: black;
+  mix-blend-mode: multiply;
+}
