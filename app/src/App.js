@@ -37,39 +37,41 @@ class App extends React.Component {
 
         const baseLayer = {
           "type": "FeatureCollection",
-          "features": mapData.features.filter(f=>f.properties.zone === 'Base')
+          "features": mapData.features.filter(f => f.properties.zone === 'Base')
         }
 
         const landfillLayers = {
           "type": "FeatureCollection",
-          "features": mapData.features.filter(f=>f.properties.zone !== 'Base')
+          "features": mapData.features.filter(f => f.properties.zone !== 'Base')
         }
 
-        layerData.forEach(d=>d.name = d.name.replace(' ', '_'))
+        layerData.forEach(d => d.name = d.name.replace(' ', '_'))
 
         console.log(layerData, baseLayer, landfillLayers)
 
         var entries = d3.nest()
-          .key(function(d) { return d.properties.zone; })
+          .key(function (d) {
+            return d.properties.zone;
+          })
           .entries(landfillLayers.features)
-          .map(d=>({
+          .map(d => ({
             name: d.key,
             nFrames: d.values.length
           }));
 
 
-        layerData.forEach(d=>{
+        layerData.forEach(d => {
           const t = find(entries, {'name': d.name})
           Object.assign(d, t)
 
           d.scale = d3.scaleLinear()
             .range(d.years)
-            .domain([d.nFrames-1, 0])
+            .domain([d.nFrames - 1, 0])
         })
 
-        landfillLayers.features.forEach(f=>{
+        landfillLayers.features.forEach(f => {
 
-          const zone = layerData.filter(_=>{
+          const zone = layerData.filter(_ => {
             return f.properties.zone === _.name.replace(' ', '_')
           })
 
@@ -82,7 +84,7 @@ class App extends React.Component {
           }
         })
 
-        mapData.features = mapData.features.sort((a,b)=>{
+        mapData.features = mapData.features.sort((a, b) => {
           if (a.properties.zone.zone === 'base') return 1
           if (b.properties.zone.zone === 'base') return -1
 
@@ -93,12 +95,12 @@ class App extends React.Component {
       })
   }
 
-  handleOpenModal () {
-    this.setState({ showModal: true });
+  handleOpenModal() {
+    this.setState({showModal: true});
   }
 
-  handleCloseModal () {
-    this.setState({ showModal: false });
+  handleCloseModal() {
+    this.setState({showModal: false});
   }
 
   onChange(year) {
@@ -110,37 +112,55 @@ class App extends React.Component {
   render() {
     const {year, landfillLayers, layerData, baseLayer, showModal} = this.state
 
-    const layerData_ = layerData.filter(d=>d.zone !== 'base')
+    const layerData_ = layerData.filter(d => d.zone !== 'base')
 
     return (
       <div className="container">
         <div className='header'>
           <div className='item'>
-            <a href='/'>dvreed.com</a>
+            <a href='https://dvreed.com' target='_blank' rel='noopener noreferrer'>dvreed.com</a>
           </div>
-          <div className='item button' onClick={this.handleOpenModal}>
-            About
+          <div style={{display: 'flex'}}>
+            <div className='item button' onClick={this.handleOpenModal}>
+              About
+            </div>
+            <div className="item">
+              <a href="https://github.com/dvreed77/boston_landfill" target='_blank' rel='noopener noreferrer'>
+                <i className="fa fa-github fa-lg" />
+              </a>
+            </div>
+
           </div>
         </div>
         <ReactModal
           isOpen={showModal}
           contentLabel="Minimal Modal Example"
+          shouldCloseOnOverlayClick={true}
+          onRequestClose={() => {
+            this.setState({ showModal: false });
+          }}
           style={{
+            overlay: {
+              backgroundColor: 'rgba(255, 255, 255, 0.95)'
+            },
             content: {
               width: '50%',
               left: '25%',
-              height: 300
+              // height: 300,
+              bottom: 'auto',
+              borderRadius: '10px',
             }
           }}
         >
-          <div>
+          <div style={{fontSize: 20}}>
             <p>If you didn't know, Boston was once a tiny peninsula.</p>
 
             <p>Starting in the early 19th century Boston started to take shape into what you see now.</p>
 
-            <p>I was inspired to create this app when a friend of mine posted a GIF she found from Boston College, which can be found here. I became frustrated because it was moving too fast for me to see all the changes that were taking place and I wanted to be able to scrub through the animation.</p>
+            <p>I was inspired to create this app when a friend of mine posted a GIF she found from Boston College, which
+              can be found <a target='_blank' rel='noopener noreferrer' href="http://www.bc.edu/bc_org/avp/cas/fnart/fa267/sequence.html">here</a>. I became frustrated because it was moving too fast for me to see all the changes that
+              were taking place and I wanted to be able to scrub through the animation.</p>
           </div>
-          <button onClick={this.handleCloseModal}>Close Modal</button>
         </ReactModal>
 
         <div className='title'>
