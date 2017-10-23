@@ -23,8 +23,8 @@ class App extends React.Component {
 
   componentWillMount() {
     const urls = [
-      '/out_v3.geojson',
-      '/layer_data.json'
+      './out_v3.geojson',
+      './layer_data.json'
     ]
 
     // separate function to make code more clear
@@ -122,7 +122,7 @@ class App extends React.Component {
           </div>
           <div style={{display: 'flex'}}>
             <div className='item button' onClick={this.handleOpenModal}>
-              About
+              about
             </div>
             <div className="item">
               <a href="https://github.com/dvreed77/boston_landfill" target='_blank' rel='noopener noreferrer'>

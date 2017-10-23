@@ -14,7 +14,15 @@ layername = 'Logan Airport'
 paths = svg.xpath("//g[@id='%s']//path" % layername.replace(' ', '_'))
 polygons = svg.xpath("//g[@id='%s']//polygon" % layername.replace(' ', '_'))
 
+
+
+
 parse_svg_path(paths[0].get('d'))
+
+
+svg.xpath("//g[@id='name_points']")
+svg.xpath("//circle")
+name_points
 
 def parse_path(path):
     points = map(lambda x: (x.start.real, x.start.imag), parse_svg_path(path.get('d')))

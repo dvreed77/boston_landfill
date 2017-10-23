@@ -302,7 +302,7 @@ export default class GeoMap extends Component {
             </clipPath>
           </defs>
           <g transform={`translate(${svgPad}, ${svgPad})`}>
-            <image href="/boston_sat.png" x={-276} y={-266} width={800/996.3*1703.685} clipPath="url(#myClip)"/>
+            <image href="./boston_sat.png" x={-276} y={-266} width={800/996.3*1703.685} clipPath="url(#myClip)"/>
             <g className="layer" />
             <g className="base-layer" />
             <g className="points-layer" />
