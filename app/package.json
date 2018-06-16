@@ -2,7 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "./",
+  "homepage": "https://dvreed77.github.io/boston_landfill",
   "dependencies": {
     "antd": "^2.13.4",
     "autoprefixer": "^7.1.2",
@@ -36,7 +36,7 @@
     "react": "^16.0.0",
     "react-dev-utils": "^4.1.0",
     "react-dom": "^16.0.0",
-    "react-modal": "^3.0.4",
+    "react-modal": "^3.4.5",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.6",
@@ -54,11 +54,13 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
-    "deploy": "rsync -avz build/ dvreed_do:/var/www/projects.dvreed.com/html/boston_landfill"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "devDependencies": {
     "babel-plugin-import": "^1.6.0",
     "css-loader": "^0.28.4",
+    "gh-pages": "^1.2.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
     "less-vars-to-js": "^1.2.0",
