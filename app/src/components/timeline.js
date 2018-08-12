@@ -5,8 +5,8 @@ import scrub from '../utils/scrub'
 export default class Timeline extends Component {
 
   static defaultProps = {
-    width: 800,
-    barHeight: 30,
+    width: 400,
+    barHeight: 20,
     barPad: 3,
     svgPad: 30
   }
@@ -17,12 +17,11 @@ export default class Timeline extends Component {
     this.draw = this.draw.bind(this)
     // this.setScale = this.setScale.bind(this)
 
-    const xScale = d3.scaleLinear()
-      .range([0, props.width])
+    
 
     this.state = {
       cursorPosition: 0,
-      xScale
+      xScale: null
     }
   }
 
@@ -30,10 +29,32 @@ export default class Timeline extends Component {
     this.draw(props.layerData)
   }
 
+  componentDidMount() {
+
+    const svgwidth = this.svg.parentElement.clientWidth
+
+    d3.select(this.svg).attr('width', svgwidth);
+
+    const xScale = d3.scaleLinear()
+      .range([0, svgwidth - 2*30])
+
+    this.setState({
+      xScale
+    })
+  }
+
   draw(layerData) {
     const {onChange, barHeight, barPad, svgPad} = this.props
     const {xScale} = this.state
     const svg = d3.select(this.svg)
+
+    
+    // width = svgwidth - padding.left - padding.right
+
+
+    
+
+    // xScale.range([0, svgwidth-60])
 
     const minYear = d3.min(layerData, d => d.years[0])
 
@@ -75,8 +96,8 @@ export default class Timeline extends Component {
     const height = layerData.length * (barHeight + barPad)
 
     return (
-      <div>
-        <svg width={width + 2*svgPad} ref={svg=>this.svg = svg}>
+      <div style={{flexGrow: 1}}>
+        <svg ref={svg=>this.svg = svg}>
           <g transform={`translate(${svgPad}, ${svgPad})`}>
             <g className='x axis' transform={`translate(0, ${height})`}/>
             {layerData.map((zone, idx) => {

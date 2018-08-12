@@ -47,7 +47,7 @@ class App extends React.Component {
 
         layerData.forEach(d => d.name = d.name.replace(' ', '_'))
 
-        console.log(layerData, baseLayer, landfillLayers)
+        // console.log(layerData, baseLayer, landfillLayers)
 
         var entries = d3.nest()
           .key(function (d) {
@@ -170,8 +170,10 @@ class App extends React.Component {
           </div>
         </div>
 
-        <Timeline onChange={this.onChange} layerData={layerData_} year={year}/>
-        <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>
+        <div style={{display: 'flex', flexDirection: 'row'}}>
+          <Timeline onChange={this.onChange} layerData={layerData_} year={year}/>
+          <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>
+        </div>        
       </div>
     );
   }

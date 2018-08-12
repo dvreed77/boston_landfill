@@ -39,7 +39,7 @@ function relax(nodes, spacing=120, n=0) {
       if (dd < spacing) {
         again = true
 
-        console.log(n1.name, n2.name, dd)
+        // console.log(n1.name, n2.name, dd)
 
         const dd1 = spacing - dd + 10,
           dx1 = dx*dd1/dd,
@@ -62,13 +62,11 @@ function relax(nodes, spacing=120, n=0) {
   }
 }
 
-
-
 export default class GeoMap extends Component {
 
   static defaultProps = {
-    width: 800,
-    height: 800,
+    width: 400,
+    height: 400,
     svgPad: 30
   }
 
@@ -102,6 +100,20 @@ export default class GeoMap extends Component {
     })
   }
 
+  componentDidMount() {
+
+    const svgwidth = this.svg.parentElement.clientWidth
+
+    d3.select(this.svg)
+    .attr('width', svgwidth)
+    .attr('height', svgwidth)
+
+    this.setState({
+      width: svgwidth - 2*30,
+      height: svgwidth - 2*30
+    })
+  }
+
   componentWillReceiveProps(props) {
     const {baseLayer, landfillLayers} = props
 
@@ -127,7 +139,7 @@ export default class GeoMap extends Component {
 
   setupBounds(mapData) {
     const {path, projection} = this.state
-    const {width, height} = this.props
+    const {width, height} = this.state
 
     const bounds = path.bounds(mapData)
 
@@ -206,9 +218,6 @@ export default class GeoMap extends Component {
 
         return c + ""
       })
-
-
-
   }
 
   drawBase(mapData) {
@@ -294,7 +303,7 @@ export default class GeoMap extends Component {
     const {width, height, svgPad} = this.props
 
     return (
-      <div>
+      <div style={{flexGrow: 1}}>
         <svg width={width+2*svgPad} height={height+2*svgPad} ref={(svg) => { this.svg = svg}}>
           <defs>
             <clipPath id="myClip">
@@ -302,7 +311,6 @@ export default class GeoMap extends Component {
             </clipPath>
           </defs>
           <g transform={`translate(${svgPad}, ${svgPad})`}>
-            <image href="./boston_sat.png" x={-276} y={-266} width={800/996.3*1703.685} clipPath="url(#myClip)"/>
             <g className="layer" />
             <g className="base-layer" />
             <g className="points-layer" />

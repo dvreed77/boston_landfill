@@ -10,8 +10,15 @@ body {
 }
 
 .container {
-  width: 80%;
+  width: 95%;
   margin: 10px auto;
+}
+
+@media screen and (min-width: 1200px) {
+  .container {
+    width: 80%;
+    margin: 10px auto;
+  }
 }
 
 svg {
