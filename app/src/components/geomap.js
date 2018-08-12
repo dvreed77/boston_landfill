@@ -304,7 +304,7 @@ export default class GeoMap extends Component {
 
     return (
       <div style={{flexGrow: 1}}>
-        <svg width={width+2*svgPad} height={height+2*svgPad} ref={(svg) => { this.svg = svg}}>
+        <svg ref={(svg) => { this.svg = svg}}>
           <defs>
             <clipPath id="myClip">
               <rect x={0} y={1} width={width} height={height-2}/>

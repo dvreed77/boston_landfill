@@ -6,19 +6,15 @@ export default class Timeline extends Component {
 
   static defaultProps = {
     width: 400,
-    barHeight: 20,
+    barHeight: 30,
     barPad: 3,
-    svgPad: 30
+    svgPad: 20,
+    screen: 'phone'
   }
 
   constructor(props) {
     super(props);
-
     this.draw = this.draw.bind(this)
-    // this.setScale = this.setScale.bind(this)
-
-    
-
     this.state = {
       cursorPosition: 0,
       xScale: null
@@ -30,35 +26,29 @@ export default class Timeline extends Component {
   }
 
   componentDidMount() {
+    const {screen} = this.props
 
     const svgwidth = this.svg.parentElement.clientWidth
 
     d3.select(this.svg).attr('width', svgwidth);
 
     const xScale = d3.scaleLinear()
-      .range([0, svgwidth - 2*30])
+      .range([0, svgwidth - 2*this.props.svgPad])
 
     this.setState({
-      xScale
+      xScale,
+      barHeight: screen === 'phone' ? 10 : 30
     })
   }
 
   draw(layerData) {
-    const {onChange, barHeight, barPad, svgPad} = this.props
-    const {xScale} = this.state
+    const {onChange, barPad, svgPad, screen} = this.props
+    const {xScale, barHeight} = this.state
     const svg = d3.select(this.svg)
-
-    
-    // width = svgwidth - padding.left - padding.right
-
-
-    
-
-    // xScale.range([0, svgwidth-60])
 
     const minYear = d3.min(layerData, d => d.years[0])
 
-    const height = layerData.length * (barHeight + barPad) + 2*svgPad
+    const height = layerData.length * (barHeight + barPad) + 60
 
     xScale
       .domain([minYear-5, 2017])
@@ -67,7 +57,6 @@ export default class Timeline extends Component {
       .attr('height', height)
 
     const brush = scrub()
-      // .extent([0, width])
       .on("brush", d => {
         if (d3.event.sourceEvent) { // not a programmatic event
           //TODO: major hack here to get it to line up
@@ -80,6 +69,7 @@ export default class Timeline extends Component {
       .call(brush)
 
     const xAxis = d3.axisBottom(xScale)
+      .ticks(5)
       .tickSizeOuter(6)
       .tickSizeInner(3)
       .tickPadding(8)
@@ -90,8 +80,8 @@ export default class Timeline extends Component {
   }
 
   render() {
-    const {xScale} = this.state;
-    const {layerData, width, barHeight, barPad, svgPad, year} = this.props
+    const {xScale, barHeight} = this.state;
+    const {layerData, width, barPad, svgPad, year, screen} = this.props
 
     const height = layerData.length * (barHeight + barPad)
 
@@ -110,7 +100,7 @@ export default class Timeline extends Component {
                 fill={`#${zone.color}`}
               />
             })}
-            {layerData.map((zone, idx) => {
+            {screen !== 'phone' && layerData.map((zone, idx) => {
               let c = d3.hsl(`#${zone.color}`)
 
               c.h = (c.h + 180) % 360;

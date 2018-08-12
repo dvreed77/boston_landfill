@@ -4,6 +4,7 @@ import Map from './components/geomap'
 import * as d3 from 'd3'
 import {find} from 'lodash'
 import ReactModal from 'react-modal'
+// import './App.css'
 
 class App extends React.Component {
   constructor(props) {
@@ -170,7 +171,7 @@ class App extends React.Component {
           </div>
         </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
+        <div className="dave">
           <Timeline onChange={this.onChange} layerData={layerData_} year={year}/>
           <Map year={year} landfillLayers={landfillLayers} baseLayer={baseLayer}/>
         </div>        

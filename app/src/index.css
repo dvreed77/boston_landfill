@@ -14,7 +14,7 @@ body {
   margin: 10px auto;
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: 1400px) {
   .container {
     width: 80%;
     margin: 10px auto;
@@ -69,4 +69,16 @@ svg {
 
 .title div {
   width: 40%;
+}
+
+.dave {
+  display: flex;
+  flex-direction: row
+}
+
+
+@media screen and (max-width: 400px) {
+  .dave {
+    flex-direction: column;
+  }
 }
