@@ -183,9 +183,6 @@ export default class GeoMap extends Component {
       cy: (bounds[1][1]+bounds[0][1])/2 * scale
     }
 
-    console.log(center)
-
-
     const namePts = d3.nest()
       .key(function(d) { return d.properties.name; })
       .entries(mapData.features)

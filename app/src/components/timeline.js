@@ -70,7 +70,6 @@ export default class Timeline extends Component {
     const xScale = d3.scaleLinear()
       .range([0, parentWidth - 2*this.props.svgPad])
 
-    console.log('SIZES', getSizes(parentWidth))
     this.setState({
       xScale,
       sizes: getSizes(parentWidth)
