@@ -25,7 +25,7 @@ function getSizes(width) {
     }
   } else {
     return {
-      width,
+      width: 400,
       barHeight: 30,
       barPad: 3,
       svgPad: 20,
@@ -54,14 +54,7 @@ export default class Timeline extends Component {
     this.state = {
       cursorPosition: 0,
       xScale: null,
-      sizes: {
-        barHeight: 30,
-        barPad: 3,
-        svgPad: 20,
-        showText: true,
-        tickLabelFontSize: 10,
-        yearLabelFontSize: 30
-      }
+      sizes: getSizes()
     }
   }
 
@@ -126,18 +119,15 @@ export default class Timeline extends Component {
   render() {
     const {xScale, sizes} = this.state;
     const {layerData, svgPad, year,
-      yearLabelFontSize
+      
     } = this.props
 
-    console.log(sizes)
-
     const height = layerData.length * (sizes.barHeight + sizes.barPad)
-
     
     return (
       <div style={{flexGrow: 1}}>
         <svg ref={svg=>this.svg = svg}>
-          <g transform={`translate(${svgPad}, ${svgPad})`}>
+          <g transform={`translate(${sizes.svgPad}, ${sizes.svgPad})`}>
             <g className='x axis' transform={`translate(0, ${height})`}/>
             {layerData.map((zone, idx) => {
               return <rect

@@ -2,6 +2,32 @@ import React, {Component} from 'react'
 import * as d3 from 'd3'
 
 
+function getSizes(width) {  
+  if (width < 400) {
+    return {
+      width,
+      relax: 70,
+      labelFontSize: 20,
+      padding: 0
+    }
+  } else if (width >= 400) {
+    return {
+      width,
+      relax: 90,
+      labelFontSize: 25,
+      padding: 0
+    }
+  } else {
+    return {
+      width,
+      relax: 120,
+      labelFontSize: 20,
+      padding: 0
+    }
+  }
+}
+
+
 function wrap(text, width) {
   text.each(function() {
     var text = d3.select(this),
@@ -86,7 +112,8 @@ export default class GeoMap extends Component {
       projection: null,
       path: null,
       bounds: [],
-      namePts: []
+      namePts: [],
+      sizes: getSizes()
     }
   }
 
@@ -102,7 +129,7 @@ export default class GeoMap extends Component {
   }
 
   componentDidMount() {
-
+    const {sizes} = this.state
     const svgwidth = this.svg.parentElement.clientWidth
 
     d3.select(this.svg)
@@ -110,8 +137,9 @@ export default class GeoMap extends Component {
     .attr('height', svgwidth)
 
     this.setState({
-      width: svgwidth - 2*30,
-      height: svgwidth - 2*30
+      width: svgwidth - 2*sizes.padding,
+      height: svgwidth - 2*sizes.padding,
+      sizes: getSizes(svgwidth)
     })
   }
 
@@ -140,7 +168,7 @@ export default class GeoMap extends Component {
 
   setupBounds(mapData) {
     const {path, projection} = this.state
-    const {width, height} = this.state
+    const {width, height, sizes} = this.state
 
     const bounds = path.bounds(mapData)
 
@@ -178,7 +206,7 @@ export default class GeoMap extends Component {
       .filter(d=>d.name !== 'undefined')
 
 
-    relax(namePts, 70)
+    relax(namePts, sizes.relax)
 
     this.setState({
       projection,
@@ -249,11 +277,12 @@ export default class GeoMap extends Component {
 
   drawPoints(namePts) {
     const {labelFontSize} = this.props
+    const {sizes} = this.state
 
     const svg = d3.select(this.svg)
 
     const textStyle = {
-      fontSize: labelFontSize,
+      fontSize: sizes.labelFontSize,
       fontWeight: 500
     }
 
@@ -303,6 +332,7 @@ export default class GeoMap extends Component {
 
   render() {
     const {width, height, svgPad} = this.props
+    const {sizes} = this.state
 
     return (
       <div style={{flexGrow: 1}}>
@@ -312,7 +342,7 @@ export default class GeoMap extends Component {
               <rect x={0} y={1} width={width} height={height-2}/>
             </clipPath>
           </defs>
-          <g transform={`translate(${svgPad}, ${svgPad})`}>
+          <g transform={`translate(${sizes.padding}, ${sizes.padding})`}>
             <g className="layer" />
             <g className="base-layer" />
             <g className="points-layer" />
