@@ -5,10 +5,6 @@ body {
   font-family: sans-serif;
 }
 
-.x.axis text {
-  font-size: 20px;
-}
-
 .container {
   width: 95%;
   margin: 10px auto;
@@ -80,5 +76,19 @@ svg {
 @media screen and (max-width: 400px) {
   .dave {
     flex-direction: column;
+  }
+
+  .title h1 {
+    font-size: 30px;
+    margin: 0;
+  }
+  
+  .title {
+    margin-bottom: 10px;
+  }
+
+  .title div {
+    width: 100%;
+    font-size: 12px;
   }
 }

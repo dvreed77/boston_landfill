@@ -67,7 +67,8 @@ export default class GeoMap extends Component {
   static defaultProps = {
     width: 400,
     height: 400,
-    svgPad: 30
+    svgPad: 30,
+    labelFontSize: 18
   }
 
   constructor(props) {
@@ -177,7 +178,7 @@ export default class GeoMap extends Component {
       .filter(d=>d.name !== 'undefined')
 
 
-    relax(namePts)
+    relax(namePts, 70)
 
     this.setState({
       projection,
@@ -247,11 +248,12 @@ export default class GeoMap extends Component {
   }
 
   drawPoints(namePts) {
+    const {labelFontSize} = this.props
 
     const svg = d3.select(this.svg)
 
     const textStyle = {
-      fontSize: 30,
+      fontSize: labelFontSize,
       fontWeight: 500
     }
 
@@ -276,7 +278,7 @@ export default class GeoMap extends Component {
       .attr('dx', 0)
       .attr('dy', 0)
       .text(d=>d.name.replace('_', ' '))
-      .call(wrap, 100);
+      .call(wrap, 80);
 
     svg
       .select('g.points-layer')
@@ -296,7 +298,7 @@ export default class GeoMap extends Component {
       .attr('dx', 0)
       .attr('dy', 0)
       .text(d=>d.name.replace('_', ' '))
-      .call(wrap, 100);
+      .call(wrap, 80);
   }
 
   render() {

@@ -2,14 +2,50 @@ import React, {Component} from 'react'
 import * as d3 from 'd3'
 import scrub from '../utils/scrub'
 
+function getSizes(width) {  
+  if (width < 400) {
+    return {
+      width,
+      barHeight: 10,
+      barPad: 3,
+      svgPad: 20,
+      showText: false,
+      tickLabelFontSize: 15,
+      yearLabelFontSize: 20
+    }
+  } else if (width >= 400) {
+    return {
+      width,
+      barHeight: 30,
+      barPad: 3,
+      svgPad: 20,
+      showText: true,
+      tickLabelFontSize: 20,
+      yearLabelFontSize: 30
+    }
+  } else {
+    return {
+      width,
+      barHeight: 30,
+      barPad: 3,
+      svgPad: 20,
+      showText: true,
+      tickLabelFontSize: 10,
+      yearLabelFontSize: 30
+    }
+  }
+}
+
 export default class Timeline extends Component {
 
   static defaultProps = {
     width: 400,
-    barHeight: 30,
+    barHeight: 10,
     barPad: 3,
     svgPad: 20,
-    screen: 'phone'
+    showText: false,
+    tickLabelFontSize: 10,
+    yearLabelFontSize: 30
   }
 
   constructor(props) {
@@ -17,7 +53,15 @@ export default class Timeline extends Component {
     this.draw = this.draw.bind(this)
     this.state = {
       cursorPosition: 0,
-      xScale: null
+      xScale: null,
+      sizes: {
+        barHeight: 30,
+        barPad: 3,
+        svgPad: 20,
+        showText: true,
+        tickLabelFontSize: 10,
+        yearLabelFontSize: 30
+      }
     }
   }
 
@@ -26,29 +70,28 @@ export default class Timeline extends Component {
   }
 
   componentDidMount() {
-    const {screen} = this.props
+    const parentWidth = this.svg.parentElement.clientWidth
 
-    const svgwidth = this.svg.parentElement.clientWidth
-
-    d3.select(this.svg).attr('width', svgwidth);
+    d3.select(this.svg).attr('width', parentWidth);
 
     const xScale = d3.scaleLinear()
-      .range([0, svgwidth - 2*this.props.svgPad])
+      .range([0, parentWidth - 2*this.props.svgPad])
 
+    console.log('SIZES', getSizes(parentWidth))
     this.setState({
       xScale,
-      barHeight: screen === 'phone' ? 10 : 30
+      sizes: getSizes(parentWidth)
     })
   }
 
   draw(layerData) {
-    const {onChange, barPad, svgPad, screen} = this.props
-    const {xScale, barHeight} = this.state
+    const {onChange, barPad, svgPad} = this.props
+    const {xScale, barHeight, sizes} = this.state
     const svg = d3.select(this.svg)
 
     const minYear = d3.min(layerData, d => d.years[0])
 
-    const height = layerData.length * (barHeight + barPad) + 60
+    const height = layerData.length * (sizes.barHeight + sizes.barPad) + 60
 
     xScale
       .domain([minYear-5, 2017])
@@ -76,15 +119,21 @@ export default class Timeline extends Component {
       .tickFormat(d3.format(""))
 
     svg.select('g.x.axis')
+      .style("font-size", sizes.tickLabelFontSize)
       .call(xAxis);
   }
 
   render() {
-    const {xScale, barHeight} = this.state;
-    const {layerData, width, barPad, svgPad, year, screen} = this.props
+    const {xScale, sizes} = this.state;
+    const {layerData, svgPad, year,
+      yearLabelFontSize
+    } = this.props
 
-    const height = layerData.length * (barHeight + barPad)
+    console.log(sizes)
 
+    const height = layerData.length * (sizes.barHeight + sizes.barPad)
+
+    
     return (
       <div style={{flexGrow: 1}}>
         <svg ref={svg=>this.svg = svg}>
@@ -94,13 +143,13 @@ export default class Timeline extends Component {
               return <rect
                 key={idx}
                 x={xScale(zone.years[0])}
-                y={idx * (barHeight + barPad)}
+                y={idx * (sizes.barHeight + sizes.barPad)}
                 width={xScale(zone.years[1]) - xScale(zone.years[0])}
-                height={barHeight}
+                height={sizes.barHeight}
                 fill={`#${zone.color}`}
               />
             })}
-            {screen !== 'phone' && layerData.map((zone, idx) => {
+            {sizes.showText && layerData.map((zone, idx) => {
               let c = d3.hsl(`#${zone.color}`)
 
               c.h = (c.h + 180) % 360;
@@ -111,9 +160,9 @@ export default class Timeline extends Component {
                 key={idx}
                 className={'timeline2'}
                 x={xScale(zone.years[0])}
-                y={idx * (barHeight + barPad)}
+                y={idx * (sizes.barHeight + sizes.barPad)}
                 dx={10}
-                dy={barHeight/2 + 8}
+                dy={sizes.barHeight/2 + 8}
                 fontWeight={400}
                 fontSize={20}
                 fill={c + ""}
@@ -121,11 +170,11 @@ export default class Timeline extends Component {
                 {zone.name.replace('_', ' ')}
               </text>
             })}
-            <g transform={`translate(0, 40)`}>
+            <g transform={`translate(0, ${sizes.svgPad})`}>
               <text
-                x={width-20}
+                x={sizes.width-sizes.svgPad-10}
                 textAnchor="end"
-                fontSize={50}
+                fontSize={sizes.yearLabelFontSize}
               >{Math.round(year)}</text>
             </g>
             <g className="slider" />

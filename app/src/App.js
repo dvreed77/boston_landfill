@@ -130,7 +130,6 @@ class App extends React.Component {
                 <i className="fa fa-github fa-lg" />
               </a>
             </div>
-
           </div>
         </div>
         <ReactModal
